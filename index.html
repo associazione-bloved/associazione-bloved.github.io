@@ -1,83 +1,102 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>associazione bloved · tutor timetables</title>
-<meta name="description" content="Tutor timetable portal for associazione bloved: weekly shifts, tutors, and the people we support.">
-<meta name="theme-color" content="#0E5A66">
+<title>associazione bloved · orari dei tutor</title>
+<meta name="description" content="Portale dell'associazione bloved: i turni dei tutor, la disponibilità settimanale e le persone che seguiamo.">
+<meta name="theme-color" content="#F2EDE1">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
+<a class="skip" href="#main">Vai al contenuto</a>
 
-<header class="site-head">
-  <div class="wrap head-row">
-    <a class="brand" href="/">
+<header class="masthead">
+  <div class="wrap masthead-row">
+    <a class="brand" href="index.html">
       <span class="brand-mark" aria-hidden="true">b</span>
-      <span class="brand-text">associazione <b>bloved</b><small>tutor timetable portal</small></span>
+      <span class="brand-text">
+        <span class="wordmark">associazione <i>bloved</i></span>
+        <small>tutor · orari · portale</small>
+      </span>
     </a>
-    <nav class="tabs" aria-label="Sections">
-      <span class="tab is-active" aria-current="page">Timetables</span>
-      <!-- one <a class="tab" href="/…"> per module that gets its own page -->
+    <nav class="nav" aria-label="Sezioni">
+      <a class="nav-item" href="index.html" aria-current="page">Portale</a>
+      <a class="nav-item" href="coverage.html">Copertura</a>
+      <a class="nav-item" href="tutors.html">Tutor</a>
     </nav>
   </div>
 </header>
 
 <main id="main" class="wrap">
 
-  <section class="lede">
-    <p class="eyebrow">Timetables</p>
-    <h1>Who tutors whom, and when.</h1>
-    <p class="sub">One place for weekly shifts, tutor availability, and the people we support. Nothing is scheduled yet.</p>
+  <section class="banner" aria-labelledby="banner-h">
+    <p class="index">— 01 — portale</p>
+    <span class="stamp">bozza · dati di esempio</span>
+    <h1 id="banner-h">Chi segue chi, e quando.</h1>
+    <p>Un posto solo per i turni della settimana, la disponibilità dei tutor e le persone che seguiamo. Non c'è ancora niente in calendario.</p>
   </section>
 
-  <section class="week" aria-labelledby="week-h">
-    <div class="section-head">
-      <h2 id="week-h">This week</h2>
-      <span class="state">no shifts assigned</span>
-    </div>
-    <ol class="week-grid">
-      <li class="day"><span class="day-name">Mon</span><span class="day-free">free</span></li>
-      <li class="day"><span class="day-name">Tue</span><span class="day-free">free</span></li>
-      <li class="day"><span class="day-name">Wed</span><span class="day-free">free</span></li>
-      <li class="day"><span class="day-name">Thu</span><span class="day-free">free</span></li>
-      <li class="day"><span class="day-name">Fri</span><span class="day-free">free</span></li>
-      <li class="day"><span class="day-name">Sat</span><span class="day-free">free</span></li>
-      <li class="day"><span class="day-name">Sun</span><span class="day-free">free</span></li>
-    </ol>
-    <p class="empty">Shifts appear here once tutors and participants are added.</p>
-  </section>
+  <div class="split">
 
-  <section class="modules-block" aria-labelledby="modules-h">
-    <div class="section-head">
-      <h2 id="modules-h">Modules</h2>
-      <span class="state">0 of 4 active</span>
-    </div>
-    <ul class="modules">
-      <li class="module">
-        <h3>Weekly timetable</h3>
-        <p>The grid above: tutor, participant, weekday, time window.</p>
-        <span class="flag">not built</span>
-      </li>
-      <li class="module">
-        <h3>Tutors</h3>
-        <p>Who tutors, what they can cover, hours available each week.</p>
-        <span class="flag">not built</span>
-      </li>
-      <li class="module">
-        <h3>Participants</h3>
-        <p>The people we support, their tutor and their usual slot.</p>
-        <span class="flag">not built</span>
-      </li>
-      <li class="module">
-        <h3>Requests</h3>
-        <p>Shift swaps and absences, with the change recorded.</p>
-        <span class="flag">not built</span>
-      </li>
-    </ul>
-  </section>
+    <section aria-labelledby="week-h">
+      <div class="shelf">
+        <h2 id="week-h">Questa settimana</h2>
+        <span class="state">nessun turno assegnato</span>
+      </div>
+      <ol class="week-grid">
+        <li class="day" style="--panel:var(--sage)"><span class="day-name">Lun</span><span class="slot-empty">libero</span></li>
+        <li class="day" style="--panel:var(--sky)"><span class="day-name">Mar</span><span class="slot-empty">libero</span></li>
+        <li class="day" style="--panel:var(--butter)"><span class="day-name">Mer</span><span class="slot-empty">libero</span></li>
+        <li class="day" style="--panel:var(--blush)"><span class="day-name">Gio</span><span class="slot-empty">libero</span></li>
+        <li class="day" style="--panel:var(--lilac)"><span class="day-name">Ven</span><span class="slot-empty">libero</span></li>
+        <li class="day" style="--panel:var(--sage)"><span class="day-name">Sab</span><span class="slot-empty">libero</span></li>
+        <li class="day" style="--panel:var(--butter)"><span class="day-name">Dom</span><span class="slot-empty">libero</span></li>
+      </ol>
+      <p class="empty">I turni compaiono qui quando ci saranno tutor e partecipanti.</p>
+    </section>
+
+    <aside class="notice" aria-labelledby="notice-h">
+      <span class="stamp">da leggere</span>
+      <h3 id="notice-h">Mercoledì e sabato sono <i>leggeri.</i></h3>
+      <p>Sono sotto le sei ore, e la domenica si copre a malapena. I grafici e la tabella completa sono nella pagina della copertura.</p>
+      <a class="go" href="coverage.html">vedi la copertura</a>
+    </aside>
+
+  </div>
+
+  <div class="shelf">
+    <h2 id="modules-h">Moduli</h2>
+    <span class="state">2 di 4 attivi</span>
+  </div>
+
+  <ul class="mosaic modules" aria-labelledby="modules-h">
+    <li class="module m-a" style="--panel:var(--sage)">
+      <div class="module-panel" aria-hidden="true">▤</div>
+      <h3>Orario settimanale</h3>
+      <p>La striscia dei giorni qui sopra: tutor, partecipante, giorno, fascia oraria. Attiva su questa pagina.</p>
+      <span class="ribbon">attivo</span>
+    </li>
+    <li class="module m-b" style="--panel:var(--sky)">
+      <div class="module-panel" aria-hidden="true">☺</div>
+      <h3><a href="tutors.html">Tutor</a></h3>
+      <p>Chi fa tutoring, che cosa può coprire, quante ore può dare a settimana.</p>
+      <span class="ribbon">apri</span>
+    </li>
+    <li class="module m-c" style="--panel:var(--butter)">
+      <div class="module-panel" aria-hidden="true">☗</div>
+      <h3>Partecipanti</h3>
+      <p>Le persone che seguiamo, il loro tutor e la fascia abituale.</p>
+      <span class="ribbon">non pronto</span>
+    </li>
+    <li class="module m-d" style="--panel:var(--blush)">
+      <div class="module-panel" aria-hidden="true">⇄</div>
+      <h3>Richieste</h3>
+      <p>Scambi di turno e assenze, con la modifica registrata, così la settimana resta leggibile.</p>
+      <span class="ribbon">non pronto</span>
+    </li>
+  </ul>
 
 </main>
 
@@ -85,7 +104,7 @@
   <div class="wrap foot-row">
     <span>associazione bloved</span>
     <a href="https://github.com/associazione-bloved">github</a>
-    <span>built on github pages</span>
+    <span>pubblicato su github pages</span>
   </div>
 </footer>
 

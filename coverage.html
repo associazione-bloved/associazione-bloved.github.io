@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Copertura · associazione bloved</title>
+<meta name="description" content="Grafici di esempio per l'associazione bloved: ore per tutor, ore per giorno, e quali fasce hanno davvero un tutor.">
+<meta name="theme-color" content="#F2EDE1">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Vai al contenuto</a>
+
+<header class="masthead">
+  <div class="wrap masthead-row">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">b</span>
+      <span class="brand-text">
+        <span class="wordmark">associazione <i>bloved</i></span>
+        <small>tutor · orari · portale</small>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Sezioni">
+      <a class="nav-item" href="index.html">Portale</a>
+      <a class="nav-item" href="coverage.html" aria-current="page">Copertura</a>
+      <a class="nav-item" href="tutors.html">Tutor</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+  <section class="banner banner-sky" aria-labelledby="banner-h">
+    <p class="index">— 02 — copertura</p>
+    <span class="stamp">dati di esempio</span>
+    <h1 id="banner-h">La settimana, in tre modi.</h1>
+    <p>Gli stessi numeri in tre forme: chi porta le ore, quali giorni pesano, e quali fasce hanno davvero un tutor.</p>
+  </section>
+
+  <div class="shelf">
+    <h2 id="tutor-h">Ore per tutor</h2>
+    <span class="state">7 tutor · 41 h</span>
+  </div>
+  <div class="panel">
+    <div class="plots">
+      <!-- Anello: un cerchio per tutor, disegnato con stroke-dasharray su una
+           circonferenza di 439,82 (r=70). check.py ricalcola ogni arco dalla legenda. -->
+      <figure class="chart donut">
+        <svg viewBox="0 0 200 200" role="img" aria-labelledby="donut-t donut-d" preserveAspectRatio="xMidYMid meet">
+          <title id="donut-t">Quota di ore settimanali per tutor</title>
+          <desc id="donut-d">G. Fabbri 9, L. Serra 8, M. Rinaldi 7, A. Conti 6, S. Bruno 5, E. Greco 4, P. Marchetti 2 ore.</desc>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--green)"  stroke-dasharray="96.55 343.28" stroke-dashoffset="-0.00"/>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--blue)"   stroke-dasharray="85.82 354.00" stroke-dashoffset="-96.55"/>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--plum)"   stroke-dasharray="75.09 364.73" stroke-dashoffset="-182.37"/>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--coral)"  stroke-dasharray="64.36 375.46" stroke-dashoffset="-257.46"/>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--gold)"   stroke-dasharray="53.64 386.19" stroke-dashoffset="-321.82"/>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--teal)"   stroke-dasharray="42.91 396.91" stroke-dashoffset="-375.46"/>
+          <circle class="seg" cx="100" cy="100" r="70" transform="rotate(-90 100 100)" style="--seg:var(--grey)"   stroke-dasharray="21.45 418.37" stroke-dashoffset="-418.37"/>
+          <circle class="hub" cx="100" cy="100" r="46"/>
+          <text class="hub-num" x="100" y="102" text-anchor="middle">41</text>
+          <!-- short and untracked: a longer caption spills over the coloured ring -->
+          <text class="hub-cap" x="100" y="120" text-anchor="middle">ore</text>
+        </svg>
+        <figcaption>Un anello, non una torta: il buco porta il totale.</figcaption>
+      </figure>
+
+      <!-- la legenda è la lettura dell'anello: niente dipende solo dal colore -->
+      <ul class="legend">
+        <li><span class="swatch" style="--seg:var(--green)"></span><span class="who">G. Fabbri</span><span class="val">9 h</span></li>
+        <li><span class="swatch" style="--seg:var(--blue)"></span><span class="who">L. Serra</span><span class="val">8 h</span></li>
+        <li><span class="swatch" style="--seg:var(--plum)"></span><span class="who">M. Rinaldi</span><span class="val">7 h</span></li>
+        <li><span class="swatch" style="--seg:var(--coral)"></span><span class="who">A. Conti</span><span class="val">6 h</span></li>
+        <li><span class="swatch" style="--seg:var(--gold)"></span><span class="who">S. Bruno</span><span class="val">5 h</span></li>
+        <li><span class="swatch" style="--seg:var(--teal)"></span><span class="who">E. Greco</span><span class="val">4 h</span></li>
+        <li><span class="swatch" style="--seg:var(--grey)"></span><span class="who">P. Marchetti</span><span class="val">2 h</span></li>
+        <li class="tot"><span class="swatch" style="--seg:transparent"></span><span class="who">Totale settimana</span><span class="val">41 h</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="shelf">
+    <h2 id="day-h">Ore per giorno</h2>
+    <span class="state">picco venerdì · 9 h</span>
+  </div>
+  <div class="panel">
+    <!-- Lollipop: x del punto = 60 + ore x 30, una riga ogni 30px da y=34.
+         La scala è tarata perché il grafico entri in 330px su un telefono: con
+         un passo più largo l'ultimo puntino finiva fuori dalla scheda. -->
+    <figure class="chart lollipop">
+      <div class="chart-scroll" tabindex="0" role="group" aria-label="Grafico a puntini, scorrevole">
+        <svg viewBox="0 0 380 248" role="img" aria-labelledby="lol-t lol-d" preserveAspectRatio="xMidYMid meet">
+          <title id="lol-t">Ore di tutoring per giorno, settimana di esempio</title>
+          <desc id="lol-d">Lun 6, Mar 8, Mer 5, Gio 7, Ven 9, Sab 4, Dom 2 ore.</desc>
+          <g class="rules">
+            <line class="rule" x1="60"  y1="24" x2="60"  y2="228"/>
+            <line class="rule" x1="150" y1="24" x2="150" y2="228"/>
+            <line class="rule" x1="240" y1="24" x2="240" y2="228"/>
+            <line class="rule" x1="330" y1="24" x2="330" y2="228"/>
+          </g>
+          <line class="stem" x1="60" y1="34"  x2="240" y2="34"/>
+          <circle class="dot" cx="240" cy="34"  r="10" style="--panel:var(--sage)"/>
+          <text class="num" x="258" y="39">6</text>
+          <text class="day" x="46" y="39" text-anchor="end">Lun</text>
+          <line class="stem" x1="60" y1="64"  x2="300" y2="64"/>
+          <circle class="dot" cx="300" cy="64"  r="10" style="--panel:var(--sky)"/>
+          <text class="num" x="318" y="69">8</text>
+          <text class="day" x="46" y="69" text-anchor="end">Mar</text>
+          <line class="stem" x1="60" y1="94"  x2="210" y2="94"/>
+          <circle class="dot" cx="210" cy="94"  r="10" style="--panel:var(--butter)"/>
+          <text class="num" x="228" y="99">5</text>
+          <text class="day" x="46" y="99" text-anchor="end">Mer</text>
+          <line class="stem" x1="60" y1="124" x2="270" y2="124"/>
+          <circle class="dot" cx="270" cy="124" r="10" style="--panel:var(--blush)"/>
+          <text class="num" x="288" y="129">7</text>
+          <text class="day" x="46" y="129" text-anchor="end">Gio</text>
+          <line class="stem" x1="60" y1="154" x2="330" y2="154"/>
+          <circle class="dot" cx="330" cy="154" r="10" style="--panel:var(--lilac)"/>
+          <text class="num" x="348" y="159">9</text>
+          <text class="day" x="46" y="159" text-anchor="end">Ven</text>
+          <line class="stem" x1="60" y1="184" x2="180" y2="184"/>
+          <circle class="dot" cx="180" cy="184" r="10" style="--panel:var(--sage)"/>
+          <text class="num" x="198" y="189">4</text>
+          <text class="day" x="46" y="189" text-anchor="end">Sab</text>
+          <line class="stem" x1="60" y1="214" x2="120" y2="214"/>
+          <circle class="dot" cx="120" cy="214" r="10" style="--panel:var(--butter)"/>
+          <text class="num" x="138" y="219">2</text>
+          <text class="day" x="46" y="219" text-anchor="end">Dom</text>
+          <g class="scale">
+            <text class="day" x="60"  y="242">0h</text>
+            <text class="day" x="150" y="242">3h</text>
+            <text class="day" x="240" y="242">6h</text>
+            <text class="day" x="330" y="242">9h</text>
+          </g>
+        </svg>
+      </div>
+      <figcaption>Gli stessi sette numeri dell'anello, letti giorno per giorno.</figcaption>
+    </figure>
+  </div>
+
+  <div class="shelf">
+    <h2 id="bands-h">Quali fasce hanno un tutor</h2>
+    <span class="state">13 fasce su 21</span>
+  </div>
+  <div class="panel">
+    <div class="heat-scroll">
+      <table class="heat">
+        <caption>Settimana di esempio — una fascia risulta coperta quando le viene assegnato un tutor</caption>
+        <thead>
+          <tr><th scope="col">Giorno</th><th scope="col">Mattina</th><th scope="col">Pomeriggio</th><th scope="col">Sera</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Lun</th><td class="on">coperto</td><td class="on">coperto</td><td class="off">libero</td></tr>
+          <tr><th scope="row">Mar</th><td class="on">coperto</td><td class="on">coperto</td><td class="on">coperto</td></tr>
+          <tr><th scope="row">Mer</th><td class="on">coperto</td><td class="off">libero</td><td class="off">libero</td></tr>
+          <tr><th scope="row">Gio</th><td class="on">coperto</td><td class="on">coperto</td><td class="off">libero</td></tr>
+          <tr><th scope="row">Ven</th><td class="on">coperto</td><td class="on">coperto</td><td class="on">coperto</td></tr>
+          <tr><th scope="row">Sab</th><td class="on">coperto</td><td class="off">libero</td><td class="off">libero</td></tr>
+          <!-- la domenica ha una sola fascia coperta: coerente con 1 tutor e 2 ore in tabella -->
+          <tr><th scope="row">Dom</th><td class="on">coperto</td><td class="off">libero</td><td class="off">libero</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Le celle coperte portano una parola oltre al colore, e quelle libere sono tratteggiate: la griglia si legge anche stampata e senza colore.</p>
+  </div>
+
+  <div class="shelf">
+    <h2 id="table-h">La stessa settimana in numeri</h2>
+    <span class="state">esempio</span>
+  </div>
+  <div class="panel">
+    <table class="data">
+      <caption>Schema di esempio — ore e tutor per giorno</caption>
+      <thead>
+        <tr><th scope="col">Giorno</th><th scope="col">Tutor</th><th scope="col" class="n">Ore</th><th scope="col">Stato</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Lun</th><td>2</td><td class="n">6</td><td><span class="pill ok">coperto</span></td></tr>
+        <tr><th scope="row">Mar</th><td>3</td><td class="n">8</td><td><span class="pill ok">coperto</span></td></tr>
+        <tr><th scope="row">Mer</th><td>2</td><td class="n">5</td><td><span class="pill warn">scarso</span></td></tr>
+        <tr><th scope="row">Gio</th><td>3</td><td class="n">7</td><td><span class="pill ok">coperto</span></td></tr>
+        <tr><th scope="row">Ven</th><td>4</td><td class="n">9</td><td><span class="pill ok">coperto</span></td></tr>
+        <tr><th scope="row">Sab</th><td>2</td><td class="n">4</td><td><span class="pill warn">scarso</span></td></tr>
+        <tr><th scope="row">Dom</th><td>1</td><td class="n">2</td><td><span class="pill warn">scarso</span></td></tr>
+      </tbody>
+      <tfoot>
+        <tr><th scope="row">Settimana</th><td>—</td><td class="n">41</td><td></td></tr>
+      </tfoot>
+    </table>
+    <p class="note">Cifre di esempio per impostare il portale. Non sono i dati dell'associazione.</p>
+  </div>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-row">
+    <span>associazione bloved</span>
+    <a href="https://github.com/associazione-bloved">github</a>
+    <span>pubblicato su github pages</span>
+  </div>
+</footer>
+
+</body>
+</html>
