@@ -1,62 +1,93 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>associazione bloved — portal</title>
-<meta name="description" content="associazione bloved — portal">
+<title>associazione bloved · tutor timetables</title>
+<meta name="description" content="Tutor timetable portal for associazione bloved: weekly shifts, tutors, and the people we support.">
+<meta name="theme-color" content="#0E5A66">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<header class="masthead">
-  <div class="wrap masthead-row">
-    <a class="wordmark" href="/">associazione <em>bloved</em></a>
-    <p class="meta">portal · draft · <span id="stamp"></span></p>
-  </div>
-  <div class="wrap">
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">b</span>
+      <span class="brand-text">associazione <b>bloved</b><small>tutor timetable portal</small></span>
+    </a>
     <nav class="tabs" aria-label="Sections">
-      <span class="tab is-active" aria-current="page">Home</span>
-      <!-- add sections here; keep one <a class="tab" href="/…"> per feature -->
+      <span class="tab is-active" aria-current="page">Timetables</span>
+      <!-- one <a class="tab" href="/…"> per module that gets its own page -->
     </nav>
   </div>
 </header>
 
-<main class="wrap">
+<main id="main" class="wrap">
 
   <section class="lede">
-    <p class="eyebrow">/ home</p>
-    <h1>The portal starts empty.</h1>
-    <p class="sub">Features land one at a time, each as its own card below.</p>
+    <p class="eyebrow">Timetables</p>
+    <h1>Who tutors whom, and when.</h1>
+    <p class="sub">One place for weekly shifts, tutor availability, and the people we support. Nothing is scheduled yet.</p>
   </section>
 
-  <section aria-labelledby="features-h">
+  <section class="week" aria-labelledby="week-h">
     <div class="section-head">
-      <span class="lbl" id="features-h">Features</span>
-      <span class="rule"></span>
-      <span class="count">0 / 6</span>
+      <h2 id="week-h">This week</h2>
+      <span class="state">no shifts assigned</span>
     </div>
-    <ul class="grid">
-      <li class="card slot"><span class="num">01</span><span class="slot-label">empty</span></li>
-      <li class="card slot"><span class="num">02</span><span class="slot-label">empty</span></li>
-      <li class="card slot"><span class="num">03</span><span class="slot-label">empty</span></li>
-      <li class="card slot"><span class="num">04</span><span class="slot-label">empty</span></li>
-      <li class="card slot"><span class="num">05</span><span class="slot-label">empty</span></li>
-      <li class="card slot"><span class="num">06</span><span class="slot-label">empty</span></li>
+    <ol class="week-grid">
+      <li class="day"><span class="day-name">Mon</span><span class="day-free">free</span></li>
+      <li class="day"><span class="day-name">Tue</span><span class="day-free">free</span></li>
+      <li class="day"><span class="day-name">Wed</span><span class="day-free">free</span></li>
+      <li class="day"><span class="day-name">Thu</span><span class="day-free">free</span></li>
+      <li class="day"><span class="day-name">Fri</span><span class="day-free">free</span></li>
+      <li class="day"><span class="day-name">Sat</span><span class="day-free">free</span></li>
+      <li class="day"><span class="day-name">Sun</span><span class="day-free">free</span></li>
+    </ol>
+    <p class="empty">Shifts appear here once tutors and participants are added.</p>
+  </section>
+
+  <section class="modules-block" aria-labelledby="modules-h">
+    <div class="section-head">
+      <h2 id="modules-h">Modules</h2>
+      <span class="state">0 of 4 active</span>
+    </div>
+    <ul class="modules">
+      <li class="module">
+        <h3>Weekly timetable</h3>
+        <p>The grid above: tutor, participant, weekday, time window.</p>
+        <span class="flag">not built</span>
+      </li>
+      <li class="module">
+        <h3>Tutors</h3>
+        <p>Who tutors, what they can cover, hours available each week.</p>
+        <span class="flag">not built</span>
+      </li>
+      <li class="module">
+        <h3>Participants</h3>
+        <p>The people we support, their tutor and their usual slot.</p>
+        <span class="flag">not built</span>
+      </li>
+      <li class="module">
+        <h3>Requests</h3>
+        <p>Shift swaps and absences, with the change recorded.</p>
+        <span class="flag">not built</span>
+      </li>
     </ul>
   </section>
 
 </main>
 
-<footer class="wrap foot">
-  <span>associazione bloved</span>
-  <span class="dot">·</span>
-  <a href="https://github.com/associazione-bloved">github</a>
-  <span class="dot">·</span>
-  <span class="meta">built on github pages</span>
+<footer class="site-foot">
+  <div class="wrap foot-row">
+    <span>associazione bloved</span>
+    <a href="https://github.com/associazione-bloved">github</a>
+    <span>built on github pages</span>
+  </div>
 </footer>
 
-<script>document.getElementById('stamp').textContent = new Date().toISOString().slice(0,10);</script>
 </body>
 </html>
