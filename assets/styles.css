@@ -1,0 +1,81 @@
+/* Print-catalogue treatments (ref: qwen3-8-27b-demos stationery-retail-catalogue). */
+:root{
+  --paper:#F5F0E4;      /* warm paper */
+  --card:#FFFBF1;       /* lighter card paper */
+  --ink:#262233;        /* dark ink */
+  --muted:#7b7484;
+  --rule:#262233;
+  --soft:#d8d1bf;
+  --coral:#e2573f;      /* flat accent fills */
+  --cobalt:#2f52b4;
+  --shadow:var(--ink);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --serif:"Iowan Old Style",Palatino,Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink)}
+body{
+  font:18px/1.55 var(--serif);
+  padding-bottom:56px;
+  /* faint static paper grain */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
+a{color:var(--ink);text-decoration:none;border-bottom:1.5px solid var(--ink)}
+a:hover{background:var(--ink);color:var(--paper)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 clamp(18px,4vw,40px)}
+.meta{font:12px/1.6 var(--mono);letter-spacing:.04em;color:var(--muted);text-transform:lowercase}
+
+/* masthead */
+.masthead{border-bottom:2.5px solid var(--rule);background:var(--card);padding-top:26px}
+.masthead-row{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline;justify-content:space-between}
+.wordmark{font-size:26px;letter-spacing:-.01em;border:0}
+.wordmark em{font-style:italic}
+.masthead-row .meta{margin:0}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.tab{
+  font:12px/1 var(--mono);letter-spacing:.06em;text-transform:lowercase;
+  border:2.5px solid var(--ink);background:var(--paper);padding:9px 13px;min-height:40px;
+  display:inline-flex;align-items:center;box-shadow:3px 3px 0 var(--shadow);
+}
+.tab.is-active{background:var(--coral);color:var(--card)}
+.tab:focus-visible,.card a:focus-visible{outline:3px solid var(--cobalt);outline-offset:4px}
+
+/* lede */
+.lede{padding:56px 0 8px}
+.eyebrow{font:12px/1 var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:lowercase;margin:0 0 22px}
+.lede h1{font-size:clamp(30px,5.4vw,46px);line-height:1.06;margin:0 0 14px;letter-spacing:-.015em}
+.lede .sub{font-size:19px;margin:0;color:var(--muted);max-width:46ch}
+
+/* section head */
+.section-head{display:flex;align-items:center;gap:14px;margin:52px 0 20px;border-bottom:2.5px solid var(--rule);padding-bottom:10px}
+.section-head .lbl{font:bold 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.section-head .rule{flex:1;border-top:1.5px dashed var(--soft)}
+.count{font:12px/1 var(--mono);color:var(--muted)}
+
+/* catalogue grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin:0;padding:0;list-style:none}
+.card{
+  position:relative;border:2.5px solid var(--ink);background:var(--card);
+  box-shadow:4px 4px 0 var(--shadow);padding:22px 20px 20px;min-height:132px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.card .num{font:12px/1 var(--mono);color:var(--muted)}
+.card .slot-label{
+  font:12px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+  border:1.5px dashed var(--soft);padding:6px 8px;width:fit-content;
+}
+.card.slot{background:repeating-linear-gradient(135deg,var(--paper) 0 9px,transparent 9px 18px),var(--card)}
+.card h2{font-size:20px;margin:0;line-height:1.2}
+/* filled card: replace .slot-label with this */
+.card .stamp{
+  position:absolute;top:-11px;right:12px;transform:rotate(-1deg);
+  font:11px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;
+  border:2.5px solid var(--ink);background:var(--paper);padding:5px 8px;
+}
+.card:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--shadow)}
+.card{transition:transform .14s,box-shadow .14s}
+
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;font:12px/1.6 var(--mono);color:var(--muted);padding-top:46px}
+.foot a{border-bottom:1px solid var(--soft)}
+.foot .dot{color:var(--soft)}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;transform:none!important}}
