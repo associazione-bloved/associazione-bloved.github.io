@@ -64,6 +64,10 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
   border-radius:23px 23px var(--cut) var(--cut);
   font:700 25px/1 var(--serif);
 }
+/* il cuore e' disegnato, non una lettera: stesso inchiostro, contorno pieno,
+   cosi' regge anche stampato in bianco e nero */
+.brand-mark svg{width:25px;height:23px;display:block}
+.brand-mark path{fill:var(--ink)}
 .brand-text{display:flex;flex-direction:column;gap:3px}
 .wordmark{font-size:25px;letter-spacing:-.015em}
 .wordmark i{font-style:italic}
@@ -328,6 +332,10 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
 .esito{margin:0 0 14px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;min-height:1.2em}
 .esito.ok{color:var(--green)}
 .esito.attesa{color:var(--gold)}
+
+/* senza identita' non si scrive: il campo lampeggia una volta invece di
+   lasciare la persona a chiedersi perche' non succede niente */
+.io-box select.chiedi{border-color:var(--coral);box-shadow:0 0 0 3px var(--blush)}
 
 /* la settimana vuota non dice cosa fare: senza questa riga la pagina sembra rotta */
 .vuoto-aiuto{margin:-6px 0 18px;font-size:15px;color:var(--muted)}

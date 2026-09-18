@@ -469,12 +469,14 @@ function vistaStatistiche() {
 
 /* ------------------------------------------------------------- modulo */
 function apriModulo(data, id) {
+  if (!chiSono()) return;                 // senza identita' non si scrive niente
   const t = id ? S.turni.concat(S.coda).find((x) => x.id === id) : null;
   const d = $('#modulo');
   $('#m-titolo').textContent = t ? 'Modifica turno' : 'Nuovo turno';
   $('#m-id').value = t ? t.id : '';
   $('#m-data').value = t ? t.data : (data || iso(new Date()));
-  $('#m-educatore').value = t ? t.educatore : (S.io || (EDUCATORI[0] || {}).codice || '');
+  // mai un ripiego su EDUCATORI[0]: attribuiva il turno alla prima educatrice
+  $('#m-educatore').value = t ? t.educatore : S.io;
   $('#m-dalle').value = t ? t.dalle : '';
   $('#m-alle').value = t ? t.alle : '';
   $('#m-stato').value = t ? t.stato : 'fatto';
@@ -502,14 +504,28 @@ function raccogli() {
     stato: $('#m-stato').value,
     oreManuali: $('#m-ore').value.trim(),
     nota: $('#m-nota').value.trim().slice(0, 300),
-    autore: S.io || '',
+    autore: S.io,
     quando: new Date().toISOString().slice(0, 16)
   };
+}
+
+/* Identita' obbligatoria per scrivere. Un turno senza autore non si attribuisce
+   a nessuno, e "chi e' andata da chi" e' esattamente il dato che serve a fine
+   mese. Leggere resta libero. */
+function chiSono() {
+  if (educatore(S.io)) return true;
+  const s = $('#io');
+  messaggio('Prima scegli chi sei, in alto a destra.', 'attesa');
+  s.classList.add('chiedi');
+  s.focus();
+  setTimeout(() => s.classList.remove('chiedi'), 2600);
+  return false;
 }
 
 /* Convalida al confine: quello che entra qui finisce nel foglio per sempre. */
 function convalida(t) {
   if (!t.data) return 'Manca la data.';
+  if (!educatore(t.autore)) return 'Prima scegli chi sei, in alto a destra.';
   if (!educatore(t.educatore)) return 'Scegli chi ha fatto il turno.';
   if (isNaN(minuti(t.dalle)) || isNaN(minuti(t.alle))) return 'Servono ora di inizio e di fine.';
   if (minuti(t.alle) <= minuti(t.dalle)) return "L'ora di fine deve venire dopo quella di inizio.";
@@ -523,6 +539,7 @@ function convalida(t) {
 }
 
 async function invia(payload) {
+  if (!chiSono()) return;       // unico punto da cui passano salvataggi e cancellazioni
   S.coda.push(payload);
   scriviJSON(K_CODA, S.coda);
   disegna();
@@ -611,6 +628,8 @@ async function configDaFoglio() {
     }
     if (edu.length) EDUCATORI = edu;
     if (bam.length) BAMBINI = bam;
+    // la mia identita' puo' non esistere piu' dopo una modifica del foglio
+    if (S.io && !educatore(S.io)) { S.io = ''; localStorage.removeItem(K_IO); }
     riempiModulo();
   } catch { /* scheda assente: restano gli elenchi di config.js */ }
 }
