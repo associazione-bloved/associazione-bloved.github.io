@@ -402,7 +402,8 @@ function grigliaGiorni(turniMese, giorni) {
     const celle = EDUCATORI.map((e) => {
       const lista = turniMese.filter((t) => t.data === data && t.educatore === e.codice);
       return `<td>${lista.map((t) =>
-        `<span class="cella-turno">${esc(t.dalle)}–${esc(t.alle)} ${pallini(t.bambini)}</span>`).join('') || ''}</td>`;
+        `<span class="cella-turno${t.stato === 'fatto' ? '' : ' non-conta'}">${esc(t.dalle)}–${esc(t.alle)} ${pallini(t.bambini)}${
+          t.stato === 'fatto' ? '' : ` <i>${esc(t.stato)}</i>`}</span>`).join('') || ''}</td>`;
     }).join('');
     const oreGiorno = [...orePerEducatore(turniMese.filter((t) => t.data === data)).values()].reduce((a, b) => a + b, 0);
     righe.push(`<tr${festivo ? ' class="festivo"' : ''}>

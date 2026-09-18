@@ -453,6 +453,12 @@ body.senza-io .io-avviso{
 .mese tbody th{white-space:nowrap;background:var(--card)}
 .mese tr.festivo td,.mese tr.festivo th{background:var(--lilac)}
 .cella-turno{display:block;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* Un turno annullato nella griglia sembrava identico a uno fatto, ma le ore
+   del giorno non lo contavano: sul foglio consegnato il conto non tornava e
+   non si capiva perche'. Ora porta la parola, oltre al tratto. */
+.cella-turno.non-conta{color:var(--muted);text-decoration:line-through}
+.cella-turno.non-conta i{font-style:normal;text-decoration:none;color:var(--coral);
+  font-size:.85em;letter-spacing:.04em}
 
 /* ——— modulo ——— */
 .modulo{
