@@ -75,7 +75,9 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
 .brand-mark path{fill:var(--ink)}
 .brand-text{display:flex;flex-direction:column;gap:3px}
 .wordmark{font-size:25px;letter-spacing:-.015em}
-.wordmark i{font-style:italic}
+/* il nome dell'associazione e' rosso e in corsivo, come sulla carta intestata;
+   --coral da' 5.30:1 sulla carta, quindi resta leggibile e non e' solo colore */
+.wordmark i{font-style:italic;color:var(--coral)}
 .brand-text small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .nav{display:flex;flex-wrap:wrap;gap:6px 20px}
 .nav-item{

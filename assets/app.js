@@ -535,7 +535,7 @@ function raccogli() {
 function chiSono() {
   if (educatore(S.io)) return true;
   const s = $('#io');
-  messaggio('Prima scegli chi sei, in alto a destra.', 'attesa');
+  messaggio('Scegli prima il tuo codice, in alto a destra.', 'attesa');
   s.classList.add('chiedi');
   s.focus();
   setTimeout(() => s.classList.remove('chiedi'), 2600);
@@ -545,7 +545,7 @@ function chiSono() {
 /* Convalida al confine: quello che entra qui finisce nel foglio per sempre. */
 function convalida(t) {
   if (!t.data) return 'Manca la data.';
-  if (!educatore(t.autore)) return 'Prima scegli chi sei, in alto a destra.';
+  if (!educatore(t.autore)) return 'Scegli prima il tuo codice, in alto a destra.';
   if (!educatore(t.educatore)) return 'Scegli chi ha fatto il turno.';
   if (isNaN(minuti(t.dalle)) || isNaN(minuti(t.alle))) return 'Servono ora di inizio e di fine.';
   if (minuti(t.alle) <= minuti(t.dalle)) return "L'ora di fine deve venire dopo quella di inizio.";
@@ -631,7 +631,7 @@ function riempiModulo() {
   $('#m-bambini').innerHTML = BAMBINI.map((b) => `<label class="scelta">
       <input type="checkbox" name="bambini" value="${esc(b.codice)}">
       <span class="pois" style="--seg:${esc(b.colore)}"></span> ${esc(b.etichetta)}</label>`).join('');
-  $('#io').innerHTML = `<option value="">chi sei?</option>` + EDUCATORI.map((e) =>
+  $('#io').innerHTML = `<option value="">— scegli —</option>` + EDUCATORI.map((e) =>
     `<option value="${esc(e.codice)}"${e.codice === S.io ? ' selected' : ''}>${esc(e.codice)} · ${esc(e.etichetta)}</option>`).join('');
 }
 
