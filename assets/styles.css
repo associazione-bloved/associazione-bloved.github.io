@@ -446,9 +446,17 @@ body.senza-io .io-avviso{
 .pois{display:inline-block;width:13px;height:13px;border-radius:50%;
   border:2px solid var(--ink);background:var(--seg);vertical-align:-2px}
 
-/* ——— griglia del mese ——— */
-.mese{font-size:11px}
-.mese th,.mese td{padding:6px 8px;border:1.5px solid var(--hair);vertical-align:top}
+/* ——— griglia del mese ———
+   A larghezza libera la tabella misurava 1039px dentro un contenitore da 968px:
+   l'ultima educatrice restava tagliata fuori anche su uno schermo grande, e
+   nulla faceva capire che si poteva scorrere. Con la larghezza fissa la tabella
+   si adatta al contenitore; sotto i 900px scorre, ma li' lo scorrimento e'
+   evidente perche' mancano piu' colonne. */
+.mese{font-size:11px;width:100%;min-width:900px;table-layout:fixed}
+.mese th,.mese td{padding:6px 7px;border:1.5px solid var(--hair);vertical-align:top;
+  overflow-wrap:break-word}
+.mese thead th:first-child{width:11%}
+.mese thead th:nth-child(2){width:8%}
 .mese thead th{background:var(--sage);position:sticky;top:0}
 .mese tbody th{white-space:nowrap;background:var(--card)}
 .mese tr.festivo td,.mese tr.festivo th{background:var(--lilac)}
@@ -456,7 +464,9 @@ body.senza-io .io-avviso{
 /* Un turno annullato nella griglia sembrava identico a uno fatto, ma le ore
    del giorno non lo contavano: sul foglio consegnato il conto non tornava e
    non si capiva perche'. Ora porta la parola, oltre al tratto. */
-.cella-turno.non-conta{color:var(--muted);text-decoration:line-through}
+/* la parola in piu' non ci sta sulla riga dell'orario: qui il ritorno a capo
+   e' voluto, con le colonne a larghezza fissa il nowrap sbordava di 56px */
+.cella-turno.non-conta{color:var(--muted);text-decoration:line-through;white-space:normal}
 .cella-turno.non-conta i{font-style:normal;text-decoration:none;color:var(--coral);
   font-size:.85em;letter-spacing:.04em}
 
