@@ -26,11 +26,15 @@
       <label for="io">Chi sei</label>
       <!-- required: serve a :not(:valid), che evidenzia il campo finche' e' vuoto -->
       <select id="io" required></select>
+      <!-- la freccia punta al menu che ha accanto, quindi verso sinistra -->
+      <span class="io-freccia" aria-hidden="true">← scegli</span>
     </div>
   </div>
 </header>
 
 <main class="wrap">
+
+  <p class="io-avviso"><b>Prima di tutto:</b> scegli chi sei, in alto a destra. Serve ogni volta che apri il registro.</p>
 
   <div class="tabs" role="tablist" aria-label="Viste">
     <button type="button" class="tab" role="tab" data-vista="settimana" aria-current="page">Settimana</button>

@@ -27,6 +27,11 @@
   --navy:#191A2B;
   --gold-on-navy:#E8BC63;
 
+  /* Le bande piene sono blu, non nere: il nero pieno pesava troppo su una
+     pagina di carta. Misurato: 7.42:1 sulla carta, 6.15:1 contro --sun,
+     quindi il testo chiaro e il totale giallo restano leggibili. */
+  --banda:#1F4E79;
+
   --serif:"Iowan Old Style",Palatino,Georgia,"Times New Roman",serif;
   --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --cut:2px;
@@ -102,7 +107,7 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
    glyphs and blurred the text, so this stays a plain bar. ——— */
 .shelf{
   display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;justify-content:space-between;
-  background:var(--ink);color:var(--paper);padding:12px 18px;margin:52px 0 22px;
+  background:var(--banda);color:var(--paper);padding:12px 18px;margin:52px 0 22px;
   font-size:11px;letter-spacing:.14em;text-transform:uppercase;
 }
 .shelf h2{margin:0;font-family:var(--serif);font-size:21px;letter-spacing:-.01em;text-transform:none}
@@ -170,7 +175,7 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
 .module h3 a{display:inline-flex;align-items:center;min-height:44px}
 .module p{margin:0 18px 16px;color:var(--muted);font-size:15px}
 .ribbon{
-  align-self:flex-start;margin:auto 0 0 18px;background:var(--ink);color:var(--paper);
+  align-self:flex-start;margin:auto 0 0 18px;background:var(--banda);color:var(--paper);
   padding:7px 16px 7px 12px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
   clip-path:polygon(0 0,100% 0,calc(100% - 9px) 50%,100% 100%,0 100%);
 }
@@ -309,13 +314,30 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
    Stessi mattoni del catalogo: carta, contorni pieni, ombre dure. Niente
    angoli molto tondi e niente scatole ruotate: tagliavano i glifi. */
 
+/* "Chi sei" non si ricorda piu' fra una visita e l'altra, quindi va chiesto
+   ogni volta e deve saltare all'occhio: campo giallo tratteggiato, freccia
+   accanto e una riga di promemoria sotto la testata. Tutto sparisce appena si
+   sceglie, cosi' non diventa rumore permanente. */
 .io-box{display:flex;align-items:center;gap:10px;font-family:var(--mono);
-  font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  position:relative}
 .io-box select,.campo select,.campo input{
   font:inherit;font-size:15px;font-family:var(--serif);color:var(--ink);
   background:var(--card);border:2.5px solid var(--ink);border-radius:var(--cut);
   padding:9px 10px;min-height:44px;
 }
+.io-freccia{display:none;font-size:10px;letter-spacing:.1em;color:var(--coral);font-weight:700}
+body.senza-io .io-freccia{display:inline}
+body.senza-io .io-box select{background:var(--sun);border-style:dashed;border-color:var(--coral)}
+
+/* la riga di promemoria: dice cosa fare, non solo che manca qualcosa */
+.io-avviso{display:none}
+body.senza-io .io-avviso{
+  display:block;margin:14px 0 0;padding:12px 16px;
+  border:2.5px solid var(--coral);border-radius:var(--cut);background:var(--blush);
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink);
+}
+.io-avviso b{letter-spacing:.08em;text-transform:uppercase}
 
 /* ——— schede ——— */
 .tabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:26px 0 18px;
@@ -325,7 +347,7 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
   background:var(--card);color:var(--ink);border:2.5px solid var(--ink);border-radius:var(--cut);
   padding:0 16px;min-height:44px;cursor:pointer;
 }
-.tab[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.tab[aria-current="page"]{background:var(--banda);color:var(--paper);border-color:var(--banda)}
 .stato-rete{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--muted)}
 .stato-rete.errore{color:var(--coral);font-weight:700}
 
@@ -333,20 +355,17 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
 .esito.ok{color:var(--green)}
 .esito.attesa{color:var(--gold)}
 
-/* senza identita' non si scrive: il campo lampeggia una volta invece di
-   lasciare la persona a chiedersi perche' non succede niente */
-.io-box select.chiedi{border-color:var(--coral);box-shadow:0 0 0 3px var(--blush)}
+/* al tentativo di scrivere senza identita' il campo lampeggia una volta */
+.io-box select.chiedi{box-shadow:0 0 0 4px var(--coral)}
 
 /* la settimana vuota non dice cosa fare: senza questa riga la pagina sembra rotta */
 .vuoto-aiuto{margin:-6px 0 18px;font-size:15px;color:var(--muted)}
 .vuoto-aiuto b{color:var(--ink)}
 
-/* "chi sei" e' il primo gesto: da spento passava inosservato */
-.io-box select:not(:valid){background:var(--sun);border-style:dashed}
 
 /* ——— barra di navigazione del periodo ——— */
 .barra{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;
-  background:var(--ink);color:var(--paper);padding:10px 14px;margin:0 0 20px}
+  background:var(--banda);color:var(--paper);padding:10px 14px;margin:0 0 20px}
 .barra-titolo{margin:0;font-family:var(--serif);font-size:19px;letter-spacing:-.01em;
   text-transform:capitalize;flex:1;min-width:150px}
 .barra-tot{font-family:var(--mono);font-size:12px;color:var(--sun);font-variant-numeric:tabular-nums}
@@ -356,8 +375,8 @@ h1,h2,h3{line-height:1.15;letter-spacing:-.01em}
   padding:0 14px;min-height:44px;min-width:44px;cursor:pointer;
 }
 .bottone:hover{background:var(--sun)}
-.bottone.primario{background:var(--ink);color:var(--paper)}
-.bottone.primario:hover{background:var(--navy)}
+.bottone.primario{background:var(--banda);color:var(--paper);border-color:var(--banda)}
+.bottone.primario:hover{background:var(--ink);border-color:var(--ink)}
 .bottone.pericolo{border-color:var(--coral);color:var(--coral)}
 .bottone.pericolo:hover{background:var(--blush)}
 .barra .bottone{border-color:var(--paper)}

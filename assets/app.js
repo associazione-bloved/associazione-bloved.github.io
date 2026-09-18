@@ -22,7 +22,6 @@ const gviz = (foglio) =>
   `${BASE}/spreadsheets/d/${C.sheetId}/gviz/tq?tqx=out:csv&headers=1` +
   (foglio ? `&sheet=${encodeURIComponent(foglio)}` : '') + `&_=${Date.now()}`;
 
-const K_IO = 'bloved.io';
 const K_CODA = 'bloved.coda';
 const K_LOCALE = 'bloved.righe';
 
@@ -36,7 +35,10 @@ const S = {                      // stato della pagina
   vista: 'settimana',
   lunedi: lunediDi(new Date()),
   mese: primoDelMese(new Date()),
-  io: localStorage.getItem(K_IO) || '',
+  /* Mai ricordata: chi apre il registro dichiara chi e' ogni volta. Sette
+     persone possono usare lo stesso telefono, e un'identita' ereditata dalla
+     volta prima attribuisce il turno alla persona sbagliata. */
+  io: '',
   turni: [],                     // registro riprodotto
   coda: leggiJSON(K_CODA, []),   // non ancora confermati dal foglio
   errore: ''
@@ -608,6 +610,9 @@ function disegna() {
   for (const b of document.querySelectorAll('[data-vista]')) {
     b.setAttribute('aria-current', b.dataset.vista === S.vista ? 'page' : 'false');
   }
+  // il promemoria resta finche' non si dice chi si e': senza, non si scrive
+  document.body.classList.toggle('senza-io', !educatore(S.io));
+
   $('#vista').innerHTML =
     S.vista === 'settimana' ? vistaSettimana()
       : S.vista === 'mese' ? vistaMese()
@@ -647,7 +652,7 @@ async function configDaFoglio() {
     if (edu.length) EDUCATORI = edu;
     if (bam.length) BAMBINI = bam;
     // la mia identita' puo' non esistere piu' dopo una modifica del foglio
-    if (S.io && !educatore(S.io)) { S.io = ''; localStorage.removeItem(K_IO); }
+    if (S.io && !educatore(S.io)) S.io = '';
     riempiModulo();
   } catch { /* scheda assente: restano gli elenchi di config.js */ }
 }
@@ -670,7 +675,7 @@ function avvia() {
 
   $('#io').addEventListener('change', (ev) => {
     S.io = ev.target.value;
-    localStorage.setItem(K_IO, S.io);
+    disegna();                      // il promemoria in cima sparisce appena scegli
   });
 
   $('#modulo').addEventListener('submit', (ev) => {
