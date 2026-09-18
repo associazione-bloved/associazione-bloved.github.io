@@ -346,21 +346,58 @@ function vistaSettimana() {
     <ol class="week-grid settimana">${celle}</ol>`;
 }
 
-/* Turni di un mese. Un solo posto che decide cosa "appartiene" al mese, usato
-   dalla vista e dal documento da stampare. */
-function turniDelMese(anno, mese) {
-  const pre = `${anno}-${String(mese + 1).padStart(2, '0')}`;
-  return riproduci([...S.turni, ...S.coda]).filter((t) => t.data.startsWith(pre));
+/* Turni in un intervallo di date, estremi inclusi. Un solo posto che decide
+   cosa "appartiene" al periodo: lo usano la vista mese, le statistiche e il
+   foglio da stampare. Le date ISO si confrontano come stringhe. */
+function turniTra(da, a) {
+  return riproduci([...S.turni, ...S.coda]).filter((t) => t.data >= da && t.data <= a);
 }
 
-/* La griglia del mese: una riga per giorno, una colonna per educatrice.
-   Stessa tabella in pagina e sul foglio stampato, cosi' i numeri non possono
-   divergere fra quello che si vede e quello che si consegna. */
-function grigliaMese(turniMese, anno, mese) {
+/* I giorni di un mese, dal primo all'ultimo. */
+function giorniDelMese(anno, mese) {
   const ultimo = new Date(anno, mese + 1, 0).getDate();
+  const out = [];
+  for (let g = 1; g <= ultimo; g++) out.push(new Date(anno, mese, g));
+  return out;
+}
+
+/* Il periodo che si sta guardando: la settimana nella vista Settimana, il mese
+   nelle altre due. Da qui esce sia l'etichetta del bottone sia il documento da
+   stampare, cosi' non possono dire due cose diverse. */
+function periodoCorrente() {
+  if (S.vista === 'settimana') {
+    const giorni = GIORNI.map((_, i) => piuGiorni(S.lunedi, i));
+    const fine = giorni[6];
+    const mese = fine.toLocaleDateString('it-IT', { month: 'long' });
+    return {
+      giorni,
+      titolo: `Turni dal ${S.lunedi.getDate()} al ${fine.getDate()} ${mese} ${fine.getFullYear()}`,
+      breve: `${S.lunedi.getDate()}–${fine.getDate()} ${mese.slice(0, 3)}`,
+      calendario: 'Calendario della settimana',
+      dentroAnello: 'ore nella settimana'
+    };
+  }
+  const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
+  const nome = S.mese.toLocaleDateString('it-IT', { month: 'long' });
+  return {
+    giorni: giorniDelMese(anno, mese),
+    titolo: `Turni di ${nome} ${anno}`,
+    breve: nome,
+    calendario: 'Calendario del mese',
+    dentroAnello: 'ore nel mese'
+  };
+}
+
+const turniDelPeriodo = (p) => turniTra(iso(p.giorni[0]), iso(p.giorni[p.giorni.length - 1]));
+
+/* La griglia: una riga per giorno, una colonna per educatrice. Prende l'elenco
+   dei giorni, cosi' la stessa tabella serve il mese intero e una settimana
+   sola. Stessa tabella in pagina e sul foglio stampato, cosi' i numeri non
+   possono divergere fra quello che si vede e quello che si consegna. */
+function grigliaGiorni(turniMese, giorni) {
   const righe = [];
-  for (let g = 1; g <= ultimo; g++) {
-    const d = new Date(anno, mese, g), data = iso(d);
+  for (const d of giorni) {
+    const data = iso(d);
     const festivo = d.getDay() === 0 || d.getDay() === 6;
     const celle = EDUCATORI.map((e) => {
       const lista = turniMese.filter((t) => t.data === data && t.educatore === e.codice);
@@ -369,7 +406,7 @@ function grigliaMese(turniMese, anno, mese) {
     }).join('');
     const oreGiorno = [...orePerEducatore(turniMese.filter((t) => t.data === data)).values()].reduce((a, b) => a + b, 0);
     righe.push(`<tr${festivo ? ' class="festivo"' : ''}>
-      <th scope="row">${GIORNI[(d.getDay() + 6) % 7]} ${g}</th>
+      <th scope="row">${GIORNI[(d.getDay() + 6) % 7]} ${d.getDate()}</th>
       <td class="n ore-giorno">${oreGiorno ? oreIt(oreGiorno) : ''}</td>${celle}</tr>`);
   }
 
@@ -389,7 +426,8 @@ function grigliaMese(turniMese, anno, mese) {
 
 function vistaMese() {
   const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
-  const turniMese = turniDelMese(anno, mese);
+  const giorni = giorniDelMese(anno, mese);
+  const turniMese = turniTra(iso(giorni[0]), iso(giorni[giorni.length - 1]));
   const totale = [...orePerEducatore(turniMese).values()].reduce((a, b) => a + b, 0);
 
   return `<div class="barra">
@@ -399,7 +437,7 @@ function vistaMese() {
       <span class="barra-tot">${oreIt(totale)} h</span>
       <button type="button" class="bottone" data-csv="1">scarica csv</button>
     </div>
-    <div class="chart-scroll">${grigliaMese(turniMese, anno, mese)}</div>
+    <div class="chart-scroll">${grigliaGiorni(turniMese, giorni)}</div>
     ${tabellaBambini(turniMese)}`;
 }
 
@@ -428,7 +466,7 @@ function arco(cx, cy, r, a0, a1) {
 /* `totale` e' quello vero (puo' essere 0 e va scritto cosi'); `scala` e' il
    divisore per gli angoli. Tenerli separati: usando il divisore anche come
    etichetta, un mese vuoto dichiarava "1,00 ore". */
-function anello(voci, totale, soloSvg) {
+function anello(voci, totale, soloSvg, didascalia) {
   const cx = 130, cy = 130, r = 88;
   const scala = totale > 0 ? totale : 1;
   let a = 0;
@@ -452,7 +490,7 @@ function anello(voci, totale, soloSvg) {
       ${archi}${bordi}
       <circle class="hub" cx="${cx}" cy="${cy}" r="62"/>
       <text class="hub-num" x="${cx}" y="${cy + 4}" text-anchor="middle">${oreIt(totale)}</text>
-      <text class="hub-cap" x="${cx}" y="${cy + 26}" text-anchor="middle">ore nel mese</text>
+      <text class="hub-cap" x="${cx}" y="${cy + 26}" text-anchor="middle">${esc(didascalia || 'ore nel mese')}</text>
     </svg>`;
   // il documento da stampare incornicia il disegno a modo suo
   return soloSvg ? svg : `<figure class="chart donut">${svg}</figure>`;
@@ -478,7 +516,8 @@ function lecca(voci) {
 
 function vistaStatistiche() {
   const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
-  const turni = turniDelMese(anno, mese);
+  const giorni = giorniDelMese(anno, mese);
+  const turni = turniTra(iso(giorni[0]), iso(giorni[giorni.length - 1]));
 
   const perB = orePerBambino(turni);
   const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
@@ -613,9 +652,8 @@ function messaggio(testo, tipo) {
    bambini) perche' i numeri consegnati non possono discostarsi da quelli a
    video. */
 function documentoMese() {
-  const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
-  const turni = turniDelMese(anno, mese);
-  const nomeMese = S.mese.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+  const periodo = periodoCorrente();
+  const turni = turniDelPeriodo(periodo);
 
   const perB = orePerBambino(turni);
   const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
@@ -643,11 +681,18 @@ function documentoMese() {
 
   return `<!doctype html>
 <html lang="it"><head><meta charset="utf-8">
-<title>Turni ${esc(nomeMese)} · Associazione bloved</title>
+<title>${esc(periodo.titolo)} · Associazione bloved</title>
 <meta name="robots" content="noindex,nofollow">
+<base href="${location.href.replace(/[^/]*$/, '')}">
+<link rel="icon" href="assets/cuore.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="stylesheet" href="assets/stampa.css">
 </head><body class="foglio">
+
+<p class="solo-schermo">
+  <button type="button" onclick="window.print()">Stampa questo foglio</button>
+  <span>oppure usa Cmd+P. Da qui puoi anche salvarlo in PDF.</span>
+</p>
 
 <header class="foglio-testa">
   <div class="foglio-marchio">
@@ -655,7 +700,7 @@ function documentoMese() {
     <span class="wordmark">Associazione <i>bloved</i></span>
   </div>
   <div class="foglio-titolo">
-    <h1>Turni di ${esc(nomeMese)}</h1>
+    <h1>${esc(periodo.titolo)}</h1>
     <p class="caption">stampato il ${esc(oggi)}</p>
   </div>
 </header>
@@ -667,8 +712,8 @@ function documentoMese() {
 </p>
 
 <section class="foglio-sez">
-  <h2>Calendario del mese</h2>
-  ${grigliaMese(turni, anno, mese)}
+  <h2>${esc(periodo.calendario)}</h2>
+  ${grigliaGiorni(turni, periodo.giorni)}
 </section>
 
 <section class="foglio-sez interrompi">
@@ -676,7 +721,7 @@ function documentoMese() {
   <div class="foglio-due">
     <figure class="chart donut">
       <figcaption class="caption">Ore per bambino</figcaption>
-      ${anello(vociB, totB, true)}
+      ${anello(vociB, totB, true, periodo.dentroAnello)}
       <ul class="legend">${legenda}
         <li class="tot"><span class="who">Totale</span><span class="val">${oreIt(totB)} h</span></li></ul>
     </figure>
@@ -697,15 +742,29 @@ function documentoMese() {
   Nessun nome di persona: educatrici per codice, bambini per colore.
 </p>
 
-<script>window.addEventListener('load', () => setTimeout(() => window.print(), 300));<\/script>
 </body></html>`;
 }
 
+/* Il foglio si apre e basta: la stampa la chiede la persona.
+
+   Prima il documento si stampava da solo appena caricato, e nasceva da
+   document.write in una finestra vuota. Su Safari 27 quella combinazione ha
+   fatto cadere il browser dentro PrintingUI: la finestra di stampa si apriva
+   mentre la pagina stava ancora finendo di impaginarsi. Ora il foglio e' un
+   documento vero, con un suo indirizzo (blob:), e la stampa parte solo quando
+   la persona la chiede: niente dialogo aperto da codice, niente corsa fra
+   impaginazione e stampa. */
 function stampaMese() {
-  const f = window.open('', '_blank');
-  if (!f) { messaggio('Il browser ha bloccato la finestra: consenti i popup.', 'attesa'); return; }
-  f.document.write(documentoMese());
-  f.document.close();
+  const html = documentoMese();
+  const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+  const f = window.open(url, '_blank');
+  if (!f) {
+    URL.revokeObjectURL(url);
+    messaggio('Il browser ha bloccato la finestra: consenti i popup e riprova.', 'attesa');
+    return;
+  }
+  // l'indirizzo resta valido finche' la finestra lo sta caricando
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function scaricaCSV() {
@@ -734,10 +793,9 @@ function scaricaCSV() {
 
 /* ------------------------------------------------------------ disegno */
 function disegna() {
-  /* Il bottone di stampa dice sempre quale mese stamperebbe: da una settimana
-     di ottobre non deve uscire il foglio di settembre. */
-  $('#stampa').textContent = 'stampa ' +
-    S.mese.toLocaleDateString('it-IT', { month: 'long' });
+  /* Il bottone dice sempre che cosa stamperebbe: la settimana che si sta
+     guardando, o il mese. Cosi' non promette una cosa e ne stampa un'altra. */
+  $('#stampa').textContent = 'stampa ' + periodoCorrente().breve;
 
   for (const b of document.querySelectorAll('[data-vista]')) {
     b.setAttribute('aria-current', b.dataset.vista === S.vista ? 'page' : 'false');

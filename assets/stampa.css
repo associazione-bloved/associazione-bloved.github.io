@@ -5,6 +5,21 @@
    Non si stampa a colori pieni per forza: ogni stato ha anche la parola, e i
    bordi d'inchiostro reggono anche in bianco e nero. */
 
+/* La barra con il tasto Stampa: il foglio non si stampa piu' da solo, la
+   stampa la chiede la persona. Sparisce sulla carta. */
+.solo-schermo{
+  display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;
+  margin:0 0 20px;padding:12px 16px;
+  border:2.5px solid var(--ink);border-radius:var(--cut);background:var(--sun);
+  font-family:var(--mono);font-size:10pt;letter-spacing:.04em;
+}
+.solo-schermo button{
+  font-family:var(--mono);font-size:10pt;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--banda);color:#fff;border:2.5px solid var(--banda);border-radius:var(--cut);
+  padding:0 18px;min-height:44px;cursor:pointer;
+}
+.solo-schermo button:hover{background:var(--ink);border-color:var(--ink)}
+
 @page{size:A4 portrait;margin:14mm 12mm}
 
 .foglio{
@@ -106,6 +121,7 @@
 
 @media print{
   .foglio{box-shadow:none;border:0;padding:0;max-width:none}
+  .solo-schermo{display:none}
   /* i fondi colorati devono restare: sono l'unico modo di distinguere i festivi */
   .foglio *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
