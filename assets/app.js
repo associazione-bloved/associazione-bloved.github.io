@@ -254,7 +254,12 @@ async function spedisci(payload) {
    cancellato. */
 async function salvaEConferma(payload) {
   await spedisci(payload);
-  for (const attesa of [600, 1200, 2000, 3000]) {
+  /* Di norma la riga compare in ~3s, ma Google a volte ci mette minuti: misurato
+     un caso in cui il modulo rispondeva "risposta registrata" e il foglio e'
+     arrivato molto dopo. Con una finestra corta la scrittura risultava fallita
+     pur essendo partita, e restava in attesa fino al riavvio. Qui si aspetta
+     fino a ~40s prima di rinunciare; oltre, ci pensa la coda. */
+  for (const attesa of [600, 1200, 2000, 3000, 5000, 8000, 10000, 10000]) {
     await new Promise((r) => setTimeout(r, attesa));
     let righe;
     try { righe = await leggiRighe(); } catch { continue; }
@@ -928,9 +933,12 @@ function avvia() {
      resta in primo piano: il foglio e' piccolo e la lettura e' una sola GET.
      ponytail: sondaggio a intervallo fisso; se un giorno servisse l'istantaneo,
      il posto giusto non e' questo ma un backend che sa spingere. */
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna(); });
-  window.addEventListener('focus', aggiorna);
-  setInterval(() => { if (!document.hidden) aggiorna(); }, 60000);
+  /* Nello stesso giro riparte anche la coda: un turno non confermato restava in
+     attesa fino al riavvio dell'app, e se Google era lento nessuno lo rispediva. */
+  const riallinea = () => { if (!document.hidden) aggiorna().then(svuotaCoda); };
+  document.addEventListener('visibilitychange', riallinea);
+  window.addEventListener('focus', riallinea);
+  setInterval(riallinea, 60000);
 
   disegna();
   aggiorna().then(configDaFoglio).then(() => { disegna(); return svuotaCoda(); });
