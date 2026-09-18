@@ -20,6 +20,14 @@
 }
 .solo-schermo button:hover{background:var(--ink);border-color:var(--ink)}
 
+/* stati della pagina prima che il foglio sia pronto */
+.foglio-attesa,.foglio-errore{
+  margin:0;padding:40px 0;font-family:var(--mono);font-size:11pt;letter-spacing:.06em;
+  color:var(--muted);
+}
+.foglio-errore{color:var(--coral);font-weight:700}
+@media print{ .foglio-attesa,.foglio-errore{display:none} }
+
 @page{size:A4 portrait;margin:14mm 12mm}
 
 .foglio{

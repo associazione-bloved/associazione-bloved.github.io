@@ -644,17 +644,12 @@ function messaggio(testo, tipo) {
   messaggio._t = setTimeout(() => { e.textContent = ''; e.className = 'esito'; }, 6000);
 }
 
-/* --------------------------------------------------------------- csv */
-/* Il documento da consegnare: non la pagina stampata, ma un foglio a se'
-   costruito per la carta. Si apre in una finestra nuova, quindi la stampa del
-   browser vede solo questo: niente schede, niente bottoni, niente menu.
-   Riusa le stesse funzioni della pagina (griglia, anello, lecca, tabella
-   bambini) perche' i numeri consegnati non possono discostarsi da quelli a
-   video. */
-function documentoMese() {
-  const periodo = periodoCorrente();
-  const turni = turniDelPeriodo(periodo);
-
+/* ------------------------------------------------------- foglio da stampare */
+/* Il contenuto del foglio: non la pagina stampata, ma un documento costruito
+   per la carta. Lo compone stampa.html, che e' una pagina vera del sito.
+   Riusa le stesse funzioni della pagina (griglia, anello, lecca) perche' i
+   numeri consegnati non possono discostarsi da quelli a video. */
+function corpoFoglio(periodo, turni) {
   const perB = orePerBambino(turni);
   const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
   const totB = vociB.reduce((a, v) => a + v.ore, 0);
@@ -679,17 +674,7 @@ function documentoMese() {
       <td class="n">${oreIt(perE.get(e.codice) || 0)}</td></tr>`).join('')}</tbody>
     <tfoot><tr><th scope="row">Totale</th><td class="n">${oreIt(totE)}</td></tr></tfoot></table>`;
 
-  return `<!doctype html>
-<html lang="it"><head><meta charset="utf-8">
-<title>${esc(periodo.titolo)} · Associazione bloved</title>
-<meta name="robots" content="noindex,nofollow">
-<base href="${location.href.replace(/[^/]*$/, '')}">
-<link rel="icon" href="assets/cuore.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/styles.css">
-<link rel="stylesheet" href="assets/stampa.css">
-</head><body class="foglio">
-
-<p class="solo-schermo">
+  return `<p class="solo-schermo">
   <button type="button" onclick="window.print()">Stampa questo foglio</button>
   <span>oppure usa Cmd+P. Da qui puoi anche salvarlo in PDF.</span>
 </p>
@@ -740,31 +725,67 @@ function documentoMese() {
   bambini nella stessa fascia fa un turno solo, e ciascun bambino riceve tutte
   quelle ore: per questo il totale per bambino puo' superare quello per educatrice.
   Nessun nome di persona: educatrici per codice, bambini per colore.
-</p>
-
-</body></html>`;
+</p>`;
 }
 
-/* Il foglio si apre e basta: la stampa la chiede la persona.
+/* Apre il foglio: una pagina vera del sito, con il periodo nell'indirizzo.
 
-   Prima il documento si stampava da solo appena caricato, e nasceva da
-   document.write in una finestra vuota. Su Safari 27 quella combinazione ha
-   fatto cadere il browser dentro PrintingUI: la finestra di stampa si apriva
-   mentre la pagina stava ancora finendo di impaginarsi. Ora il foglio e' un
-   documento vero, con un suo indirizzo (blob:), e la stampa parte solo quando
-   la persona la chiede: niente dialogo aperto da codice, niente corsa fra
-   impaginazione e stampa. */
+   Niente blob e niente document.write. Il documento costruito al volo non e'
+   una pagina come le altre: Safari lo ha stampato bianco e, con la stampa
+   automatica, e' arrivato a chiudersi. Una pagina vera si ricarica, si stampa,
+   si salva fra i preferiti e si riapre, perche' tutto quello che le serve sta
+   nell'indirizzo. */
 function stampaMese() {
-  const html = documentoMese();
-  const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-  const f = window.open(url, '_blank');
-  if (!f) {
-    URL.revokeObjectURL(url);
+  const p = periodoCorrente();
+  const da = iso(p.giorni[0]), a = iso(p.giorni[p.giorni.length - 1]);
+  const url = `stampa.html?da=${da}&a=${a}&tipo=${S.vista === 'settimana' ? 'settimana' : 'mese'}`;
+  if (!window.open(url, '_blank')) {
     messaggio('Il browser ha bloccato la finestra: consenti i popup e riprova.', 'attesa');
+  }
+}
+
+/* --------------------------------------------- la pagina stampa.html
+   Si regge da sola: legge il periodo dall'indirizzo, rilegge i turni dal
+   foglio e si disegna. Non dipende dalla finestra che l'ha aperta. */
+async function avviaFoglio() {
+  const q = new URLSearchParams(location.search);
+  const da = q.get('da'), a = q.get('a');
+  const corpo = document.getElementById('foglio');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(da || '') || !/^\d{4}-\d{2}-\d{2}$/.test(a || '') || a < da) {
+    corpo.innerHTML = '<p class="foglio-errore">Periodo non valido. Torna al registro e ' +
+      '<a href="turni.html">riprova da lì</a>.</p>';
     return;
   }
-  // l'indirizzo resta valido finche' la finestra lo sta caricando
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+  try {
+    S.turni = await leggiTurni();
+  } catch (e) {
+    corpo.innerHTML = '<p class="foglio-errore">Non riesco a leggere il foglio dei turni. ' +
+      'Controlla la connessione e ricarica la pagina.</p>';
+    return;
+  }
+  await configDaFoglio();
+
+  const giorni = [];
+  for (let d = daISO(da); iso(d) <= a; d = piuGiorni(d, 1)) giorni.push(d);
+
+  const settimana = q.get('tipo') === 'settimana';
+  const fine = giorni[giorni.length - 1];
+  const nomeMese = fine.toLocaleDateString('it-IT', { month: 'long' });
+  const periodo = settimana ? {
+    giorni,
+    titolo: `Turni dal ${giorni[0].getDate()} al ${fine.getDate()} ${nomeMese} ${fine.getFullYear()}`,
+    calendario: 'Calendario della settimana',
+    dentroAnello: 'ore nella settimana'
+  } : {
+    giorni,
+    titolo: `Turni di ${nomeMese} ${fine.getFullYear()}`,
+    calendario: 'Calendario del mese',
+    dentroAnello: 'ore nel mese'
+  };
+
+  document.title = `${periodo.titolo} · Associazione bloved`;
+  corpo.innerHTML = corpoFoglio(periodo, turniTra(da, a));
 }
 
 function scaricaCSV() {
@@ -843,7 +864,9 @@ async function configDaFoglio() {
     if (bam.length) BAMBINI = bam;
     // la mia identita' puo' non esistere piu' dopo una modifica del foglio
     if (S.io && !educatore(S.io)) S.io = '';
-    riempiModulo();
+    // il foglio da stampare non ha il modulo: lo aggiorna solo il registro.
+    // Dentro il try, una chiamata mancata scarterebbe anche gli elenchi appena letti.
+    if (document.getElementById('modulo')) riempiModulo();
   } catch { /* scheda assente: restano gli elenchi di config.js */ }
 }
 
@@ -900,7 +923,12 @@ function avvia() {
   aggiorna().then(configDaFoglio).then(() => { disegna(); return svuotaCoda(); });
 }
 
-if (typeof document !== 'undefined' && document.getElementById('vista')) avvia();
+/* Lo stesso file serve due pagine: il registro e il foglio da stampare.
+   Si sceglie da quale elemento esiste, non dall'indirizzo. */
+if (typeof document !== 'undefined') {
+  if (document.getElementById('vista')) avvia();
+  else if (document.getElementById('foglio')) avviaFoglio();
+}
 
 /* esposto per il controllo automatico */
 window.BLOVED = { oreDi, orePerEducatore, orePerBambino, riproduci, leggiCSV, turniDaCSV, sovrapposizioni, convalida, S };
