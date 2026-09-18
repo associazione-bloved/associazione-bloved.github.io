@@ -920,6 +920,18 @@ function avvia() {
 
   window.addEventListener('online', svuotaCoda);
 
+  /* La pagina si riallinea da sola: senza, una scheda lasciata aperta mostrava
+     tutto il giorno la settimana di quando era stata aperta, mentre le altre
+     educatrici scrivevano. Da qui passa anche l'avviso di sovrapposizione, che
+     confronta con quello che questa scheda ha in memoria.
+     Si rilegge quando si tornano a guardare i turni, e ogni minuto se la scheda
+     resta in primo piano: il foglio e' piccolo e la lettura e' una sola GET.
+     ponytail: sondaggio a intervallo fisso; se un giorno servisse l'istantaneo,
+     il posto giusto non e' questo ma un backend che sa spingere. */
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) aggiorna(); });
+  window.addEventListener('focus', aggiorna);
+  setInterval(() => { if (!document.hidden) aggiorna(); }, 60000);
+
   disegna();
   aggiorna().then(configDaFoglio).then(() => { disegna(); return svuotaCoda(); });
 }
