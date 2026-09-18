@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>associazione bloved · orari dei tutor</title>
-<meta name="description" content="Portale dell'associazione bloved: i turni dei tutor, la disponibilità settimanale e le persone che seguiamo.">
+<title>associazione bloved · portale</title>
+<meta name="description" content="Portale dell'associazione bloved: il registro dei turni delle educatrici.">
 <meta name="theme-color" content="#F2EDE1">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/styles.css">
@@ -18,13 +18,12 @@
       <span class="brand-mark" aria-hidden="true">b</span>
       <span class="brand-text">
         <span class="wordmark">associazione <i>bloved</i></span>
-        <small>tutor · orari · portale</small>
+        <small>portale</small>
       </span>
     </a>
     <nav class="nav" aria-label="Sezioni">
       <a class="nav-item" href="index.html" aria-current="page">Portale</a>
-      <a class="nav-item" href="coverage.html">Copertura</a>
-      <a class="nav-item" href="tutors.html">Tutor</a>
+      <a class="nav-item" href="turni.html">Registro turni</a>
     </nav>
   </div>
 </header>
@@ -33,68 +32,75 @@
 
   <section class="banner" aria-labelledby="banner-h">
     <p class="index">— 01 — portale</p>
-    <span class="stamp">bozza · dati di esempio</span>
-    <h1 id="banner-h">Chi segue chi, e quando.</h1>
-    <p>Un posto solo per i turni della settimana, la disponibilità dei tutor e le persone che seguiamo. Non c'è ancora niente in calendario.</p>
+    <h1 id="banner-h">Chi c'è, e quando.</h1>
+    <p>Le educatrici segnano qui i loro turni. Le ore si contano da sole, settimana per settimana e a fine mese, per ogni educatrice e per ogni bambino.</p>
   </section>
 
   <div class="split">
 
-    <section aria-labelledby="week-h">
+    <section aria-labelledby="come-h">
       <div class="shelf">
-        <h2 id="week-h">Questa settimana</h2>
-        <span class="state">nessun turno assegnato</span>
+        <h2 id="come-h">Come funziona</h2>
+        <span class="state">tre passi</span>
       </div>
-      <ol class="week-grid">
-        <li class="day" style="--panel:var(--sage)"><span class="day-name">Lun</span><span class="slot-empty">libero</span></li>
-        <li class="day" style="--panel:var(--sky)"><span class="day-name">Mar</span><span class="slot-empty">libero</span></li>
-        <li class="day" style="--panel:var(--butter)"><span class="day-name">Mer</span><span class="slot-empty">libero</span></li>
-        <li class="day" style="--panel:var(--blush)"><span class="day-name">Gio</span><span class="slot-empty">libero</span></li>
-        <li class="day" style="--panel:var(--lilac)"><span class="day-name">Ven</span><span class="slot-empty">libero</span></li>
-        <li class="day" style="--panel:var(--sage)"><span class="day-name">Sab</span><span class="slot-empty">libero</span></li>
-        <li class="day" style="--panel:var(--butter)"><span class="day-name">Dom</span><span class="slot-empty">libero</span></li>
-      </ol>
-      <p class="empty">I turni compaiono qui quando ci saranno tutor e partecipanti.</p>
+      <ul class="listing">
+        <li>
+          <span class="disc">1</span>
+          <span class="who"><b>Apri il registro</b>
+            <small>niente password, niente account</small></span>
+        </li>
+        <li>
+          <span class="disc">2</span>
+          <span class="who"><b>Dici chi sei, una volta sola</b>
+            <small>il telefono se lo ricorda</small></span>
+        </li>
+        <li>
+          <span class="disc">3</span>
+          <span class="who"><b>Segni il turno</b>
+            <small>giorno, orario, bambini seguiti</small></span>
+        </li>
+      </ul>
+      <p class="empty">Le ore si calcolano dall'orario, al quarto d'ora. I turni annullati restano scritti ma non contano.</p>
     </section>
 
     <aside class="notice" aria-labelledby="notice-h">
-      <span class="stamp">da leggere</span>
-      <h3 id="notice-h">Mercoledì e sabato sono <i>leggeri.</i></h3>
-      <p>Sono sotto le sei ore, e la domenica si copre a malapena. I grafici e la tabella completa sono nella pagina della copertura.</p>
-      <a class="go" href="coverage.html">vedi la copertura</a>
+      <span class="stamp">privacy</span>
+      <h3 id="notice-h">Nessun nome, <i>mai.</i></h3>
+      <p>Le educatrici sono codici, i bambini sono colori. Nel registro non compare nessun nome di persona, né in pagina né nel file.</p>
+      <a class="go" href="turni.html">apri il registro</a>
     </aside>
 
   </div>
 
   <div class="shelf">
-    <h2 id="modules-h">Moduli</h2>
-    <span class="state">2 di 4 attivi</span>
+    <h2 id="cosa-h">Cosa c'è dentro</h2>
+    <span class="state">registro attivo</span>
   </div>
 
-  <ul class="mosaic modules" aria-labelledby="modules-h">
+  <ul class="mosaic modules" aria-labelledby="cosa-h">
     <li class="module m-a" style="--panel:var(--sage)">
       <div class="module-panel" aria-hidden="true">▤</div>
-      <h3>Orario settimanale</h3>
-      <p>La striscia dei giorni qui sopra: tutor, partecipante, giorno, fascia oraria. Attiva su questa pagina.</p>
-      <span class="ribbon">attivo</span>
+      <h3><a href="turni.html">Settimana</a></h3>
+      <p>I sette giorni con i turni di tutte. Si tocca un giorno per aggiungerne uno, si tocca un turno per correggerlo.</p>
+      <span class="ribbon">apri</span>
     </li>
     <li class="module m-b" style="--panel:var(--sky)">
-      <div class="module-panel" aria-hidden="true">☺</div>
-      <h3><a href="tutors.html">Tutor</a></h3>
-      <p>Chi fa tutoring, che cosa può coprire, quante ore può dare a settimana.</p>
+      <div class="module-panel" aria-hidden="true">▦</div>
+      <h3><a href="turni.html">Mese</a></h3>
+      <p>La griglia del mese, un giorno per riga e un'educatrice per colonna, con i totali in fondo.</p>
       <span class="ribbon">apri</span>
     </li>
     <li class="module m-c" style="--panel:var(--butter)">
-      <div class="module-panel" aria-hidden="true">☗</div>
-      <h3>Partecipanti</h3>
-      <p>Le persone che seguiamo, il loro tutor e la fascia abituale.</p>
-      <span class="ribbon">non pronto</span>
+      <div class="module-panel" aria-hidden="true">◑</div>
+      <h3><a href="turni.html">Ore per bambino</a></h3>
+      <p>Quante ore ha ricevuto davvero ogni bambino nel mese, contate sui turni fatti.</p>
+      <span class="ribbon">apri</span>
     </li>
     <li class="module m-d" style="--panel:var(--blush)">
-      <div class="module-panel" aria-hidden="true">⇄</div>
-      <h3>Richieste</h3>
-      <p>Scambi di turno e assenze, con la modifica registrata, così la settimana resta leggibile.</p>
-      <span class="ribbon">non pronto</span>
+      <div class="module-panel" aria-hidden="true">⤓</div>
+      <h3><a href="turni.html">Excel e stampa</a></h3>
+      <p>Il mese si scarica in un file per Excel, oppure si stampa su un foglio da appendere.</p>
+      <span class="ribbon">apri</span>
     </li>
   </ul>
 

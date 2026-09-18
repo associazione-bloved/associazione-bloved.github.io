@@ -1,92 +1,121 @@
 # associazione-bloved.github.io
 
-Portale dell'**associazione bloved** — pubblicato su https://associazione-bloved.github.io
+Portale dell'**associazione bloved** — <https://associazione-bloved.github.io>
 
-Sito statico, nessuna build, nessuna dipendenza, **nessun JavaScript**. Solo HTML
-più un foglio di stile. Tre pagine, tutte in italiano (`lang="it"`).
+Un registro dei turni per le educatrici che seguono bambini con disabilità a
+domicilio. Le educatrici segnano i turni dal sito, dal telefono, senza account e
+senza password. Le ore si contano da sole: per settimana, per mese, per
+educatrice e per bambino.
+
+Sito statico, nessuna build, nessuna dipendenza, nessun framework. Tutto in
+italiano (`lang="it"`).
+
+## Privacy
+
+Nel registro **non compare nessun nome di persona**. Le educatrici sono codici
+(`E1`…`E7`), i bambini sono colori. Vale in pagina, nel foglio e nei file
+scaricati. `turni.html` è `noindex`.
+
+## Come scrive, senza un server
+
+```
+turni.html + assets/app.js ──POST──▶ modulo Google ──▶ foglio Google
+        ▲                                                   │
+        └───────────────── legge il csv ────────────────────┘
+```
+
+GitHub Pages non ha un server, quindi non può scrivere in un file Google da solo.
+Il modulo Google è l'unico indirizzo che accetta una scrittura da una pagina
+statica: è una porta di servizio, non una pagina da compilare. **Nessuno apre mai
+il modulo**: le educatrici usano solo il sito.
+
+Due conseguenze, entrambe volute:
+
+- **La risposta del POST non è leggibile** (`no-cors`). Quindi dopo aver scritto
+  il sito **rilegge il foglio**: *Salvato ✓* compare solo quando la riga è
+  davvero lì. Se non arriva, il turno resta *in attesa* sul telefono e il sito
+  riprova da solo, anche dopo che l'app è stata chiusa. Niente va perso in
+  silenzio.
+- **Un modulo sa solo aggiungere righe.** Il foglio è quindi un registro: ogni
+  riga porta `id` e `azione` (`nuovo`, `modifica`, `cancella`) e il sito
+  ricostruisce lo stato tenendo, per ogni `id`, l'ultima riga. Correggere un
+  turno aggiunge una riga invece di sovrascriverla, e resta la storia delle
+  modifiche.
+
+Finché `assets/config.js` è vuoto il sito gira in **modalità locale**: funziona
+tutto, ma i turni restano sul dispositivo. Il collegamento al foglio è descritto
+passo per passo in `~/.hermes/workspaces/bloved-portal/google/DEPLOY.md`.
+
+## Regola delle ore
+
+```
+stato ≠ fatto        → 0        (annullato e non fatto restano scritti, non contano)
+ore a mano indicate  → quelle   (la casella eccezioni vince sempre)
+altrimenti           → (alle − dalle) arrotondato al quarto d'ora
+```
+
+Le ore di un'educatrice si contano per **fascia oraria distinta**: se segue due
+bambini insieme dalle 16:30 alle 18:00, lei ha fatto 1,5 h e **ciascun** bambino
+ne ha ricevute 1,5. È la differenza fra ore lavorate e ore ricevute, ed è il
+motivo per cui i due totali non coincidono.
+
+Le sovrapposizioni (stessa educatrice, o stesso bambino, in due posti insieme)
+avvisano ma non bloccano: si segnala l'errore, non si impedisce di registrare la
+realtà.
+
+## File
+
+| file | cosa fa |
+|---|---|
+| `index.html` | la copertina del portale |
+| `turni.html` | il registro: settimana, mese, statistiche, modulo, stampa |
+| `assets/app.js` | ore, conti, registro, rete, coda dei non confermati |
+| `assets/config.js` | i tre valori del collegamento + educatrici e bambini |
+| `assets/styles.css` | unico foglio di stile; token in cima, `@media print` in fondo |
+| `robots.txt` | tiene il registro fuori dai motori di ricerca |
 
 ## Design
 
 Linguaggio "cartoleria / catalogo stampato", scelto da Lorenzo dal pool di demo
-del giorno di rilascio di Qwen3.8-27B. Il pool originale non esiste più (la
-galleria risponde 404); i preview sono archiviati e i token qui sotto sono stati
-misurati sul preview archiviato di `stationery-retail-catalogue`, non stimati.
+di Qwen3.8-27B (`stationery-retail-catalogue`); i token sono stati misurati sul
+preview archiviato, non stimati.
 
 | token | valore | uso |
 |---|---|---|
 | `--paper` | `#F2EDE1` | fondo pagina |
 | `--card` | `#FCF7EE` | carta delle schede |
-| `--ink` | `#1A1410` | inchiostro caldo, uno solo per testo, bordi, ombre |
+| `--ink` | `#1A1410` | inchiostro caldo: testo, bordi, ombre |
 | `--muted` | `#5E574C` | testo secondario |
-| `--hair` | `#8A8175` | filetti e caselle vuote tratteggiate |
-| pastelli | `--sage --sky --butter --blush --lilac` | riempimenti, riusati tra giorni, grafici e moduli |
-| accenti | `--green --blue --plum --coral --gold --teal` | etichette di stato |
+| `--hair` | `#8A8175` | filetti e caselle tratteggiate |
 
-Vocabolario di forme: blocchi pastello con contorno d'inchiostro, barre di
-sezione scure, cerchi numerati, nastri con la punta tagliata, caselle
-tratteggiate e grafici circolari. Tutto resta squadrato e dritto di proposito:
-angoli molto arrotondati e riquadri inclinati o ritagliati tagliavano le lettere
-e rendevano il testo illeggibile, quindi il testo non sta mai dentro un
-riquadro ruotato o molto arrotondato. Contorni in inchiostro 2.5px, ombre piene
-senza sfocatura (3px piccole, 5px grandi), angoli 2px, serif per i testi e
-monospaziato maiuscolo per tutta la cromatura. Niente tema scuro: il riferimento
-è stampato.
+Contorni 2.5px, ombre piene senza sfocatura, angoli 2px, serif per i testi e
+monospaziato maiuscolo per la cromatura. Tutto resta squadrato e dritto di
+proposito: angoli molto arrotondati e riquadri inclinati tagliavano le lettere.
+Niente tema scuro: il riferimento è stampato.
 
-## File
+Lo stato di un turno non è **mai** solo un colore: `annullato` e `non fatto`
+hanno anche il tratteggio e la parola scritta, così si leggono anche stampati in
+bianco e nero.
 
-- `index.html` — banda, testata, banner ad arco, striscia dei giorni, avviso, mosaico dei moduli.
-- `coverage.html` — i tre grafici e la tabella.
-- `tutors.html` — l'elenco dei tutor a righe.
-- `assets/styles.css` — tutto; token in cima, `@media print` in fondo.
-- `assets/favicon.svg`
-- `.nojekyll` — evita che GitHub Pages attivi Jekyll.
+## Modificare educatrici e bambini
 
-## I grafici
+Si cambiano dal foglio, in una scheda chiamata `Config` (colonne: tipo, codice,
+etichetta, colore). Se c'è, vince sul contenuto di `config.js`. I sei colori di
+partenza sono quelli del file Excel originale dell'associazione.
 
-Nessuna libreria e nessun JavaScript: i grafici sono SVG scritti a mano, quindi
-ogni figura esiste due volte (disegno e numeri). `check.py` ricalcola ogni
-arco e ogni puntino dal testo accanto e fallisce se divergono.
+## Anteprima e controlli
 
-- **Anello** (`coverage.html`, ore per tutor): un `<circle>` per tutor con
-  `stroke-dasharray` su circonferenza `439.82` (r=70) e `stroke-dashoffset`
-  cumulativo; il colore arriva da `--seg`, che il foglio di stile deve mappare su
-  `stroke` — senza quella riga l'anello non si vede affatto.
-- **Lollipop** (ore per giorno): puntino a `x = 96 + ore × 46`, una riga ogni
-  30px da `y = 34`.
-- **Griglia delle fasce**: una tabella vera, con la parola in ogni cella oltre
-  al colore, così si legge anche stampata e in bianco e nero.
-- **Tabella**: la stessa settimana in numeri, con `<caption>` e `<th scope>`.
-
-Gli SVG in `.chart-scroll` mantengono la larghezza naturale e scorrono sotto i
-760px: il testo SVG scala con il viewBox e su un telefono diventerebbe illeggibile.
-
-## Modificare i dati di esempio
-
-I numeri di esempio sono segnaposto, non dati dell'associazione. Cambiandoli,
-aggiorna **sia** il disegno **sia** i numeri, poi esegui il controllo: è quello
-che tiene oneste le due copie.
-
-## Aggiungere un modulo
-
-1. Sostituisci `<span class="ribbon">non pronto</span>` con il contenuto vero,
-   o collega il `<h3>` a una nuova pagina.
-2. Aggiorna `.shelf .state` (`n di 4 attivi`).
-3. Dai al modulo il suo pastello con `style="--panel:var(--sage)"`.
-4. Quando ha una pagina sua, aggiungi `<a class="nav-item" href="modulo.html">`
-   e marca quella corrente con `aria-current="page"`.
-5. I turni veri vanno nei `<li class="day">`: togli `.slot-empty` e metti orario
-   e tutor. Lo stato è sempre una parola, mai solo un colore.
-6. Commit e push su `main`: Pages ripubblica da solo.
-
-## Anteprima locale e controllo
-
+```bash
+cd ~/.hermes/workspaces/bloved-portal
+node test-logica.js                                # 40 controlli: ore, conti, csv, convalida
+uv run --with playwright python check-turni.py     # 37 controlli nel browser
 ```
-python3 -m http.server 8767 --bind 127.0.0.1     # da questa cartella
-cd ~/.hermes/workspaces/bloved-portal && uv run --with playwright python check.py
-```
+
+Il secondo avvia un finto Google in locale (`finto-google.py`) e prova il giro
+completo: scrive, rilegge, conferma, modifica, cancella. Verifica anche
+contrasto AA, bersagli >= 44px, assenza di scorrimento orizzontale fra 320 e
+1440px, link di salto, testo mai tagliato dal proprio riquadro e orari mai
+spezzati su due righe.
 
 Il controllo non è opzionale per una modifica visiva: l'accessibilità è il punto
-di questo sito. Verifica contrasto AA su ogni ruolo di testo, bersagli tattili
->= 44px, contorni >= 3:1, nessun overflow orizzontale da 320px in su, link di
-salto, movimento ridotto, foglio di stampa, coerenza dei numeri tra pagine e
-assenza di testo inglese residuo.
+di questo sito.

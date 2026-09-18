@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro turni · associazione bloved</title>
+<meta name="description" content="Registro dei turni delle educatrici: settimana, mese, ore per educatrice e per bambino.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F2EDE1">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<a class="skip" href="#vista">Vai al registro</a>
+
+<header class="masthead">
+  <div class="wrap masthead-row">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">b</span>
+      <span class="brand-text">
+        <span class="wordmark">associazione <i>bloved</i></span>
+        <small>registro turni</small>
+      </span>
+    </a>
+    <div class="io-box">
+      <label for="io">Chi sei</label>
+      <!-- required: serve a :not(:valid), che evidenzia il campo finche' e' vuoto -->
+      <select id="io" required></select>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="tabs" role="tablist" aria-label="Viste">
+    <button type="button" class="tab" role="tab" data-vista="settimana" aria-current="page">Settimana</button>
+    <button type="button" class="tab" role="tab" data-vista="mese" aria-current="false">Mese</button>
+    <button type="button" class="tab" role="tab" data-vista="stat" aria-current="false">Statistiche</button>
+    <span id="stato-rete" class="stato-rete"></span>
+  </div>
+
+  <p id="esito" class="esito" role="status" aria-live="polite"></p>
+
+  <div id="vista"></div>
+
+  <p class="note stampa-nota">Solo i turni <b>fatti</b> contano nelle ore. Nessun nome: educatrici per codice, bambini per colore.</p>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-row">
+    <span>associazione bloved</span>
+    <a href="index.html">portale</a>
+    <button type="button" class="bottone" onclick="window.print()">stampa</button>
+  </div>
+</footer>
+
+<dialog id="modulo" class="modulo">
+  <form method="dialog">
+    <div class="modulo-head">
+      <h2 id="m-titolo">Nuovo turno</h2>
+      <button type="submit" value="annulla" class="bottone" aria-label="Chiudi">✕</button>
+    </div>
+
+    <input type="hidden" id="m-id">
+
+    <div class="campi">
+      <p class="campo"><label for="m-data">Giorno</label>
+        <input type="date" id="m-data" required></p>
+      <p class="campo"><label for="m-educatore">Educatrice</label>
+        <select id="m-educatore" required></select></p>
+    </div>
+    <!-- dalle e alle restano appaiate: separate si leggono come due domande diverse -->
+    <div class="campi">
+      <p class="campo"><label for="m-dalle">Dalle</label>
+        <input type="time" id="m-dalle" step="300" required></p>
+      <p class="campo"><label for="m-alle">Alle</label>
+        <input type="time" id="m-alle" step="300" required></p>
+    </div>
+
+    <fieldset class="campo-largo">
+      <legend>Bambini seguiti</legend>
+      <div id="m-bambini" class="scelte"></div>
+    </fieldset>
+
+    <div class="campi">
+      <p class="campo"><label for="m-stato">Stato</label>
+        <select id="m-stato"></select></p>
+      <p class="campo"><label for="m-ore">Ore a mano</label>
+        <input type="text" id="m-ore" inputmode="decimal" placeholder="solo se diverse">
+        <small>Vuoto = calcolate dall'orario.</small></p>
+    </div>
+
+    <p class="campo campo-largo"><label for="m-nota">Nota</label>
+      <input type="text" id="m-nota" maxlength="300" placeholder="facoltativa"></p>
+
+    <p id="m-avvisi" class="avvisi" role="alert"></p>
+
+    <div class="modulo-piede">
+      <button type="button" id="m-elimina" class="bottone pericolo">Elimina</button>
+      <span class="spinta"></span>
+      <button type="submit" value="annulla" class="bottone">Annulla</button>
+      <button type="submit" value="salva" class="bottone primario">Salva</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="assets/config.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
