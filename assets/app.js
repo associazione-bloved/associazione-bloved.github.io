@@ -683,7 +683,7 @@ function corpoFoglio(periodo, turni) {
 <header class="foglio-testa">
   <div class="foglio-marchio">
     <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 22" role="presentation"><path d="M12 20.5 3.6 12.1a5.3 5.3 0 0 1 0-7.5 5.3 5.3 0 0 1 7.5 0l.9.9.9-.9a5.3 5.3 0 0 1 7.5 0 5.3 5.3 0 0 1 0 7.5Z"/></svg></span>
-    <span class="wordmark">Associazione <i>bloved</i></span>
+    <span class="wordmark">Associazione <i>Bloved</i></span>
   </div>
   <div class="foglio-titolo">
     <h1>${esc(periodo.titolo)}</h1>
@@ -785,7 +785,7 @@ async function avviaFoglio() {
     dentroAnello: 'ore nel mese'
   };
 
-  document.title = `${periodo.titolo} · Associazione bloved`;
+  document.title = `${periodo.titolo} · Associazione Bloved`;
   corpo.innerHTML = corpoFoglio(periodo, turniTra(da, a));
 }
 
