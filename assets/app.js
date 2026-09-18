@@ -148,16 +148,24 @@ const etichettaEdu = (c) => (educatore(c) || {}).etichetta || c;
 const etichettaBimbo = (c) => (bambino(c) || {}).etichetta || c;
 const coloreBimbo = (c) => (bambino(c) || {}).colore || '#8A8175';
 
-/* ------------------------------------------------------------ registro */
+/* ------------------------------------------------------------ registro
+   Per ogni id vince la riga con `v` piu' alto, NON l'ultima del foglio: il
+   modulo Google scrive le risposte nell'ordine in cui le riceve, che non e'
+   l'ordine in cui sono partite. Misurato: una modifica spedita prima di una
+   cancellazione e' finita nel foglio DOPO, e fidandosi dell'ordine delle righe
+   il turno cancellato tornava a galla. `v` lo decide chi scrive, e a parita'
+   (stesso millisecondo) vince l'ultima riga. */
 function riproduci(righe) {
   const m = new Map();
   for (const r of righe) {
     if (!r || !r.id) continue;
-    if (r.azione === 'cancella') m.delete(r.id);
-    else m.set(r.id, r);
+    const prima = m.get(r.id);
+    if (prima && (prima.v || 0) > (r.v || 0)) continue;   // gia' vista una piu' recente
+    m.set(r.id, r);
   }
-  return [...m.values()].sort((a, b) =>
-    (a.data + a.dalle).localeCompare(b.data + b.dalle));
+  return [...m.values()]
+    .filter((r) => r.azione !== 'cancella')
+    .sort((a, b) => (a.data + a.dalle).localeCompare(b.data + b.dalle));
 }
 
 /* CSV vero: il JSON contiene virgole e virgolette, quindi il campo arriva
@@ -199,11 +207,16 @@ function turniDaCSV(testo) {
 }
 
 /* --------------------------------------------------------------- rete */
-async function leggiTurni() {
-  if (MODO === 'locale') return riproduci(leggiJSON(K_LOCALE, []));
+/* Le righe grezze del registro, nell'ordine in cui sono state scritte. */
+async function leggiRighe() {
+  if (MODO === 'locale') return leggiJSON(K_LOCALE, []);
   const r = await fetch(gviz(), { cache: 'no-store' });
   if (!r.ok) throw new Error(`foglio non leggibile (${r.status})`);
-  return riproduci(turniDaCSV(await r.text()));
+  return turniDaCSV(await r.text());
+}
+
+async function leggiTurni() {
+  return riproduci(await leggiRighe());
 }
 
 async function spedisci(payload) {
@@ -219,18 +232,23 @@ async function spedisci(payload) {
   await fetch(URL_FORM, { method: 'POST', mode: 'no-cors', body });
 }
 
-/* Scrive e poi CONTROLLA. Ritorna true solo se la riga e' nel foglio. */
+/* Scrive e poi CONTROLLA che la riga sia ARRIVATA nel registro.
+   Si cerca la riga esatta (id + v) fra quelle grezze, non il turno nello stato
+   ricostruito: se nel frattempo arriva una cancellazione o una modifica piu'
+   recente, il turno non e' piu' visibile pur essendo la riga arrivata. Cercare
+   nello stato faceva dichiarare fallita una scrittura riuscita, che restava in
+   coda e al riavvio veniva rispedita: una modifica poteva resuscitare un turno
+   cancellato. */
 async function salvaEConferma(payload) {
   await spedisci(payload);
   for (const attesa of [600, 1200, 2000, 3000]) {
     await new Promise((r) => setTimeout(r, attesa));
-    let turni;
-    try { turni = await leggiTurni(); } catch { continue; }
-    const trovato = turni.find((t) => t.id === payload.id);
-    const ok = payload.azione === 'cancella'
-      ? !trovato
-      : (trovato && (trovato.v || 0) >= payload.v);
-    if (ok) { S.turni = turni; return true; }
+    let righe;
+    try { righe = await leggiRighe(); } catch { continue; }
+    if (righe.some((r) => r.id === payload.id && r.v === payload.v)) {
+      S.turni = riproduci(righe);
+      return true;
+    }
   }
   return false;
 }
