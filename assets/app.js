@@ -335,12 +335,18 @@ function vistaSettimana() {
     <ol class="week-grid settimana">${celle}</ol>`;
 }
 
-function vistaMese() {
-  const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
-  const ultimo = new Date(anno, mese + 1, 0).getDate();
-  const dellMese = (t) => t.data.startsWith(`${anno}-${String(mese + 1).padStart(2, '0')}`);
-  const turniMese = riproduci([...S.turni, ...S.coda.filter((p) => p.azione !== 'cancella')]).filter(dellMese);
+/* Turni di un mese. Un solo posto che decide cosa "appartiene" al mese, usato
+   dalla vista e dal documento da stampare. */
+function turniDelMese(anno, mese) {
+  const pre = `${anno}-${String(mese + 1).padStart(2, '0')}`;
+  return riproduci([...S.turni, ...S.coda]).filter((t) => t.data.startsWith(pre));
+}
 
+/* La griglia del mese: una riga per giorno, una colonna per educatrice.
+   Stessa tabella in pagina e sul foglio stampato, cosi' i numeri non possono
+   divergere fra quello che si vede e quello che si consegna. */
+function grigliaMese(turniMese, anno, mese) {
+  const ultimo = new Date(anno, mese + 1, 0).getDate();
   const righe = [];
   for (let g = 1; g <= ultimo; g++) {
     const d = new Date(anno, mese, g), data = iso(d);
@@ -360,21 +366,30 @@ function vistaMese() {
   const totali = EDUCATORI.map((e) => `<td class="n">${oreIt(perEdu.get(e.codice) || 0)}</td>`).join('');
   const totale = [...perEdu.values()].reduce((a, b) => a + b, 0);
 
-  return `<div class="barra">
-      <button type="button" class="bottone" data-mese="-1" aria-label="Mese precedente">←</button>
-      <h2 class="barra-titolo">${esc(S.mese.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }))}</h2>
-      <button type="button" class="bottone" data-mese="1" aria-label="Mese successivo">→</button>
-      <span class="barra-tot">${oreIt(totale)} h</span>
-      <button type="button" class="bottone" data-csv="1">scarica csv</button>
-    </div>
-    <div class="chart-scroll"><table class="data mese">
+  return `<table class="data mese">
       <caption>Ore per giorno e per educatrice — solo i turni fatti contano</caption>
       <thead><tr><th scope="col">Giorno</th><th scope="col" class="n ore-giorno">Ore</th>
         ${EDUCATORI.map((e) => `<th scope="col">${esc(e.codice)}</th>`).join('')}</tr></thead>
       <tbody>${righe.join('')}</tbody>
       <tfoot><tr><th scope="row">Totale</th>
         <td class="n ore-giorno">${oreIt(totale)}</td>${totali}</tr></tfoot>
-    </table></div>
+    </table>`;
+}
+
+function vistaMese() {
+  const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
+  const turniMese = turniDelMese(anno, mese);
+  const totale = [...orePerEducatore(turniMese).values()].reduce((a, b) => a + b, 0);
+
+  return `<div class="barra">
+      <button type="button" class="bottone" data-mese="-1" aria-label="Mese precedente">←</button>
+      <h2 class="barra-titolo">${esc(S.mese.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }))}</h2>
+      <button type="button" class="bottone" data-mese="1" aria-label="Mese successivo">→</button>
+      <span class="barra-tot">${oreIt(totale)} h</span>
+      <button type="button" class="bottone" data-csv="1">scarica csv</button>
+      <button type="button" class="bottone" data-stampa="1">foglio da stampare</button>
+    </div>
+    <div class="chart-scroll">${grigliaMese(turniMese, anno, mese)}</div>
     ${tabellaBambini(turniMese)}`;
 }
 
@@ -403,7 +418,7 @@ function arco(cx, cy, r, a0, a1) {
 /* `totale` e' quello vero (puo' essere 0 e va scritto cosi'); `scala` e' il
    divisore per gli angoli. Tenerli separati: usando il divisore anche come
    etichetta, un mese vuoto dichiarava "1,00 ore". */
-function anello(voci, totale) {
+function anello(voci, totale, soloSvg) {
   const cx = 130, cy = 130, r = 88;
   const scala = totale > 0 ? totale : 1;
   let a = 0;
@@ -422,13 +437,15 @@ function anello(voci, totale) {
     ? `<circle class="ring-edge" cx="${cx}" cy="${cy}" r="${r + 13}"/>
        <circle class="ring-edge" cx="${cx}" cy="${cy}" r="${r - 13}"/>`
     : `<circle class="ring-vuoto" cx="${cx}" cy="${cy}" r="${r}"/>`;
-  return `<figure class="chart donut"><svg viewBox="0 0 260 260" role="img"
+  const svg = `<svg viewBox="0 0 260 260" role="img"
       aria-label="Ore per bambino: ${voci.map((v) => `${v.etichetta} ${oreIt(v.ore)}`).join(', ')}">
       ${archi}${bordi}
       <circle class="hub" cx="${cx}" cy="${cy}" r="62"/>
       <text class="hub-num" x="${cx}" y="${cy + 4}" text-anchor="middle">${oreIt(totale)}</text>
       <text class="hub-cap" x="${cx}" y="${cy + 26}" text-anchor="middle">ore nel mese</text>
-    </svg></figure>`;
+    </svg>`;
+  // il documento da stampare incornicia il disegno a modo suo
+  return soloSvg ? svg : `<figure class="chart donut">${svg}</figure>`;
 }
 
 function lecca(voci) {
@@ -451,9 +468,7 @@ function lecca(voci) {
 
 function vistaStatistiche() {
   const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
-  const pre = `${anno}-${String(mese + 1).padStart(2, '0')}`;
-  const turni = riproduci([...S.turni, ...S.coda.filter((p) => p.azione !== 'cancella')])
-    .filter((t) => t.data.startsWith(pre));
+  const turni = turniDelMese(anno, mese);
 
   const perB = orePerBambino(turni);
   const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
@@ -581,6 +596,108 @@ function messaggio(testo, tipo) {
 }
 
 /* --------------------------------------------------------------- csv */
+/* Il documento da consegnare: non la pagina stampata, ma un foglio a se'
+   costruito per la carta. Si apre in una finestra nuova, quindi la stampa del
+   browser vede solo questo: niente schede, niente bottoni, niente menu.
+   Riusa le stesse funzioni della pagina (griglia, anello, lecca, tabella
+   bambini) perche' i numeri consegnati non possono discostarsi da quelli a
+   video. */
+function documentoMese() {
+  const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
+  const turni = turniDelMese(anno, mese);
+  const nomeMese = S.mese.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+  const perB = orePerBambino(turni);
+  const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
+  const totB = vociB.reduce((a, v) => a + v.ore, 0);
+
+  const perE = orePerEducatore(turni);
+  const vociE = EDUCATORI.map((e) => ({ etichetta: e.codice, ore: perE.get(e.codice) || 0 }));
+  const totE = vociE.reduce((a, v) => a + v.ore, 0);
+
+  const giorniCoperti = new Set(turni.filter((t) => oreDi(t) > 0).map((t) => t.data)).size;
+  const oggi = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const legenda = vociB.map((v) => `<li>
+      <span class="swatch" style="--seg:${esc(v.colore)}"></span>
+      <span class="who">${esc(v.etichetta)}</span>
+      <span class="val">${oreIt(v.ore)} h</span></li>`).join('');
+
+  const tabellaEdu = `<table class="data">
+    <caption>Ore per educatrice</caption>
+    <thead><tr><th scope="col">Educatrice</th><th scope="col" class="n">Ore</th></tr></thead>
+    <tbody>${EDUCATORI.map((e) => `<tr>
+      <th scope="row">${esc(e.codice)} · ${esc(e.etichetta)}</th>
+      <td class="n">${oreIt(perE.get(e.codice) || 0)}</td></tr>`).join('')}</tbody>
+    <tfoot><tr><th scope="row">Totale</th><td class="n">${oreIt(totE)}</td></tr></tfoot></table>`;
+
+  return `<!doctype html>
+<html lang="it"><head><meta charset="utf-8">
+<title>Turni ${esc(nomeMese)} · Associazione bloved</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/stampa.css">
+</head><body class="foglio">
+
+<header class="foglio-testa">
+  <div class="foglio-marchio">
+    <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 22" role="presentation"><path d="M12 20.5 3.6 12.1a5.3 5.3 0 0 1 0-7.5 5.3 5.3 0 0 1 7.5 0l.9.9.9-.9a5.3 5.3 0 0 1 7.5 0 5.3 5.3 0 0 1 0 7.5Z"/></svg></span>
+    <span class="wordmark">Associazione <i>bloved</i></span>
+  </div>
+  <div class="foglio-titolo">
+    <h1>Turni di ${esc(nomeMese)}</h1>
+    <p class="caption">stampato il ${esc(oggi)}</p>
+  </div>
+</header>
+
+<p class="riassunto">
+  <b>${oreIt(totE)} ore</b> in ${giorniCoperti} giorni ·
+  ${turni.filter((t) => t.stato === 'fatto').length} turni fatti ·
+  ${turni.filter((t) => t.stato !== 'fatto').length} fra annullati e non fatti
+</p>
+
+<section class="foglio-sez">
+  <h2>Calendario del mese</h2>
+  ${grigliaMese(turni, anno, mese)}
+</section>
+
+<section class="foglio-sez interrompi">
+  <h2>Riepilogo delle ore</h2>
+  <div class="foglio-due">
+    <figure class="chart donut">
+      <figcaption class="caption">Ore per bambino</figcaption>
+      ${anello(vociB, totB, true)}
+      <ul class="legend">${legenda}
+        <li class="tot"><span class="who">Totale</span><span class="val">${oreIt(totB)} h</span></li></ul>
+    </figure>
+    <div>${tabellaEdu}</div>
+  </div>
+</section>
+
+<section class="foglio-sez">
+  <h2>Confronto fra educatrici</h2>
+  ${lecca(vociE)}
+</section>
+
+<p class="foglio-piede">
+  Le ore si calcolano dall'orario, arrotondate al quarto d'ora. I turni annullati
+  e non fatti restano registrati ma non contano. Un'educatrice che segue due
+  bambini nella stessa fascia fa un turno solo, e ciascun bambino riceve tutte
+  quelle ore: per questo il totale per bambino puo' superare quello per educatrice.
+  Nessun nome di persona: educatrici per codice, bambini per colore.
+</p>
+
+<script>window.addEventListener('load', () => setTimeout(() => window.print(), 300));<\/script>
+</body></html>`;
+}
+
+function stampaMese() {
+  const f = window.open('', '_blank');
+  if (!f) { messaggio('Il browser ha bloccato la finestra: consenti i popup.', 'attesa'); return; }
+  f.document.write(documentoMese());
+  f.document.close();
+}
+
 function scaricaCSV() {
   const anno = S.mese.getFullYear(), mese = S.mese.getMonth();
   const pre = `${anno}-${String(mese + 1).padStart(2, '0')}`;
@@ -671,6 +788,7 @@ function avvia() {
     else if (b.dataset.nuovo) apriModulo(b.dataset.nuovo, '');
     else if (b.dataset.modifica) apriModulo('', b.dataset.modifica);
     else if (b.dataset.csv) scaricaCSV();
+    else if (b.dataset.stampa) stampaMese();
   });
 
   $('#io').addEventListener('change', (ev) => {

@@ -1,0 +1,116 @@
+/* Foglio da consegnare: stesso linguaggio del sito, ma pensato per l'A4.
+   Si carica DOPO styles.css e vale solo per il documento (body.foglio), non
+   per il sito. La pagina web non stampa piu' se stessa: il bottone apre questo.
+
+   Non si stampa a colori pieni per forza: ogni stato ha anche la parola, e i
+   bordi d'inchiostro reggono anche in bianco e nero. */
+
+@page{size:A4 portrait;margin:14mm 12mm}
+
+.foglio{
+  background:#fff;
+  font:12pt/1.45 var(--serif);
+  max-width:190mm;
+  margin:0 auto;
+  padding:10mm 4mm;
+}
+
+/* ——— testata ——— */
+.foglio-testa{
+  display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between;
+  border-bottom:2.5px solid var(--ink);padding-bottom:12px;margin-bottom:18px;
+}
+.foglio-marchio{display:flex;align-items:center;gap:12px}
+.foglio-titolo{text-align:right}
+/* niente capitalize: in italiano il mese e' minuscolo e "Turni Di Settembre"
+   e' sbagliato. La maiuscola iniziale la mette il testo, non il css. */
+.foglio-titolo h1{margin:0;font-size:24pt;letter-spacing:-.01em}
+.foglio-titolo .caption{margin:4px 0 0}
+
+/* il riassunto in una riga: il numero che serve subito, in cima */
+.riassunto{
+  margin:0 0 22px;padding:11px 16px;
+  border:2.5px solid var(--ink);border-radius:var(--cut);background:var(--sun);
+  font-family:var(--mono);font-size:10.5pt;letter-spacing:.04em;
+}
+.riassunto b{font-size:13pt;letter-spacing:0}
+
+/* ——— sezioni ——— */
+/* una sezione non si spezza fra il titolo e il suo contenuto: il titolo
+   "Confronto fra educatrici" restava in fondo a una pagina e il grafico
+   finiva in quella dopo */
+.foglio-sez{margin:0 0 24px;break-inside:avoid}
+.foglio-sez h2{
+  margin:0 0 12px;padding:8px 14px;
+  background:var(--banda);color:#fff;
+  font-family:var(--mono);font-size:10pt;letter-spacing:.14em;text-transform:uppercase;font-weight:400;
+  break-after:avoid;
+}
+/* il calendario invece puo' spezzarsi: se un mese non ci sta, meglio due
+   pagine che una tabella schiacciata */
+.foglio-sez:has(.mese){break-inside:auto}
+/* il riepilogo parte da pagina nuova: spezzato a meta' non si legge */
+.interrompi{break-before:page}
+
+.foglio-due{display:grid;gap:22px;grid-template-columns:1fr 1fr;align-items:start}
+
+/* ——— la griglia del mese ———
+   Sette educatrici piu' giorno e ore fanno nove colonne: a larghezza libera
+   la tabella sbordava dal foglio e l'ultima colonna finiva tagliata. Si fissa
+   la larghezza totale e si lascia che siano le celle a stringersi. */
+.foglio .mese{font-size:7.5pt;width:100%;table-layout:fixed}
+.foglio .mese th,.foglio .mese td{padding:1.5px 4px;overflow-wrap:break-word;line-height:1.2}
+.foglio .mese thead th:first-child{width:13%}
+.foglio .mese thead th:nth-child(2){width:9%}
+.foglio .mese thead th{background:var(--sage);position:static}
+/* l'orario resta unito, ma la cella puo' mandare a capo il turno successivo:
+   con nowrap la colonna si allargava comunque e la tabella sbordava */
+.foglio .cella-turno{font-size:7pt;white-space:normal;line-height:1.25}
+.foglio .pois{width:7px;height:7px;border-width:1.5px;vertical-align:0}
+/* una riga per giorno non deve mai spezzarsi fra due pagine */
+.foglio .mese tr{break-inside:avoid}
+.foglio .mese thead{display:table-header-group}   /* l'intestazione si ripete */
+/* il totale NO: ripetuto in fondo a ogni pagina sembrava il totale di quella
+   pagina, e un "22,50" sotto il giorno 21 e' una cifra sbagliata da leggere */
+.foglio .mese tfoot{display:table-row-group}
+
+/* :not(.mese) e' necessario, non decorativo: la griglia del mese ha classe
+   "data mese", quindi queste regole la colpivano con la stessa specificita' e,
+   stando piu' in basso, vincevano — la griglia restava a 9,5pt con 6px di
+   padding e sbordava sulla seconda pagina. */
+.foglio .data:not(.mese){font-size:9.5pt;width:100%}
+.foglio .data:not(.mese) th,.foglio .data:not(.mese) td{padding:6px 8px}
+
+/* ——— grafici ——— */
+.foglio .chart{margin:0}
+.foglio .donut svg{width:100%;max-width:74mm;margin:0 auto}
+.foglio .lollipop svg{width:100%;max-width:150mm}
+.foglio .legend{margin:14px 0 0;font-size:9pt}
+.foglio .legend li{padding:5px 2px}
+/* la didascalia sta in cima, accanto al titolo dell'altra tabella: in fondo
+   alla colonna sembrava riferita alla tabella sbagliata */
+.foglio .chart figcaption{margin:0 0 10px;text-align:center}
+
+/* ——— chiusura ——— */
+.foglio-piede{
+  margin:26px 0 0;padding-top:12px;border-top:1.5px solid var(--hair);
+  font-family:var(--mono);font-size:8.5pt;line-height:1.6;color:var(--muted);
+  break-inside:avoid;
+}
+
+/* a schermo il foglio si vede come un foglio appoggiato sul tavolo */
+@media screen{
+  body.foglio{background:var(--paper);padding:16px}
+  .foglio{background:#fff;box-shadow:var(--shadow-lg);border:2.5px solid var(--ink);padding:26px}
+}
+
+@media print{
+  .foglio{box-shadow:none;border:0;padding:0;max-width:none}
+  /* i fondi colorati devono restare: sono l'unico modo di distinguere i festivi */
+  .foglio *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+@media (max-width:700px){
+  .foglio-due{grid-template-columns:1fr}
+  .foglio-titolo{text-align:left}
+}
