@@ -69,6 +69,17 @@ function lunediDi(d) {           // la settimana parte di lunedi', come nel file
 /* dichiarazione, non const: S la usa prima di questa riga */
 function primoDelMese(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
 
+/* Cambiare settimana porta con se' il mese: le viste Mese e Statistiche, e il
+   foglio da stampare, seguono la settimana che si sta guardando invece di
+   restare ferme al mese di apertura. */
+function vaiA(lunedi) {
+  S.lunedi = lunedi;
+  // il mese della settimana e' quello del giovedi': una settimana a cavallo
+  // appartiene al mese in cui cadono la maggior parte dei giorni
+  S.mese = primoDelMese(piuGiorni(lunedi, 3));
+  disegna();
+}
+
 const minuti = (hhmm) => {
   const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || '').trim());
   return m ? (+m[1]) * 60 + (+m[2]) : NaN;
@@ -387,7 +398,6 @@ function vistaMese() {
       <button type="button" class="bottone" data-mese="1" aria-label="Mese successivo">→</button>
       <span class="barra-tot">${oreIt(totale)} h</span>
       <button type="button" class="bottone" data-csv="1">scarica csv</button>
-      <button type="button" class="bottone" data-stampa="1">foglio da stampare</button>
     </div>
     <div class="chart-scroll">${grigliaMese(turniMese, anno, mese)}</div>
     ${tabellaBambini(turniMese)}`;
@@ -724,6 +734,11 @@ function scaricaCSV() {
 
 /* ------------------------------------------------------------ disegno */
 function disegna() {
+  /* Il bottone di stampa dice sempre quale mese stamperebbe: da una settimana
+     di ottobre non deve uscire il foglio di settembre. */
+  $('#stampa').textContent = 'stampa ' +
+    S.mese.toLocaleDateString('it-IT', { month: 'long' });
+
   for (const b of document.querySelectorAll('[data-vista]')) {
     b.setAttribute('aria-current', b.dataset.vista === S.vista ? 'page' : 'false');
   }
@@ -782,8 +797,8 @@ function avvia() {
     const b = ev.target.closest('button');
     if (!b) return;
     if (b.dataset.vista) { S.vista = b.dataset.vista; disegna(); }
-    else if (b.dataset.sposta) { S.lunedi = piuGiorni(S.lunedi, +b.dataset.sposta); disegna(); }
-    else if (b.dataset.oggi) { S.lunedi = lunediDi(new Date()); disegna(); }
+    else if (b.dataset.sposta) { vaiA(piuGiorni(S.lunedi, +b.dataset.sposta)); }
+    else if (b.dataset.oggi) { vaiA(lunediDi(new Date())); }
     else if (b.dataset.mese) { S.mese = new Date(S.mese.getFullYear(), S.mese.getMonth() + (+b.dataset.mese), 1); disegna(); }
     else if (b.dataset.nuovo) apriModulo(b.dataset.nuovo, '');
     else if (b.dataset.modifica) apriModulo('', b.dataset.modifica);

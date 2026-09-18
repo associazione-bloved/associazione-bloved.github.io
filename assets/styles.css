@@ -350,6 +350,11 @@ body.senza-io .io-avviso{
   padding:0 16px;min-height:44px;cursor:pointer;
 }
 .tab[aria-current="page"]{background:var(--banda);color:var(--paper);border-color:var(--banda)}
+/* il tasto stampa vive fra le schede ma non e' una scheda: si distingue con la
+   carta gialla, cosi' non sembra una quarta vista */
+.stampa-tasto{background:var(--sun)}
+.stampa-tasto:hover{background:var(--ink);color:var(--paper)}
+.stampa-tasto::before{content:"⎙ ";font-size:12px}
 .stato-rete{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--muted)}
 .stato-rete.errore{color:var(--coral);font-weight:700}
 
@@ -412,15 +417,21 @@ body.senza-io .io-avviso{
   padding:8px 7px;min-height:44px;cursor:pointer;width:100%;font-family:var(--mono);
 }
 .chip:hover{background:var(--sun)}
-/* Due righe fisse, sempre: orario sopra, poi codice + pallini + ore.
-   Le ore stanno con i pallini finche' c'e' posto; con tre bambini la riga si
-   riempie (E1 + 3 pallini + "3,00 h" = 118px in 98px) e le ore scendono da
-   sole. Nessun testo va mai a capo dentro se stesso. */
+/* Due righe: orario sopra (riga intera), poi codice + pallini + ore.
+   Il wrap serve, ed e' proprio quello che manda l'orario a capo: con nowrap
+   tutto finisce su una riga sola, i pallini si azzerano e il contenuto sborda
+   (misurato: 178px in 98px). Sono i pallini a cedere spazio per primi, cosi'
+   le ore restano accanto al codice invece di finire su una terza riga. */
 .chip-ora{flex:0 0 100%;font-size:10px;font-weight:700;letter-spacing:0;
   font-variant-numeric:tabular-nums;white-space:nowrap}
-.chip-edu{font-size:10px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
-.chip-pois{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
-.chip-ore{margin-left:auto;font-size:10px;letter-spacing:0;color:var(--muted);
+.chip-edu{flex:0 0 auto;font-size:10px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+/* I pallini cedono spazio per primi, e si sovrappongono un po' quando sono
+   tanti: nella colonna da 98px tre bambini interi spingevano le ore su una
+   terza riga, dove "3,00 h" sembrava staccato dal turno. */
+.chip-pois{display:flex;gap:2px;align-items:center;flex:0 1 auto;min-width:0}
+.chip-pois .pois{width:11px;height:11px;flex:0 0 11px}
+.chip-pois .pois + .pois{margin-left:-3px}
+.chip-ore{flex:0 0 auto;margin-left:auto;font-size:10px;letter-spacing:0;color:var(--muted);
   font-variant-numeric:tabular-nums;white-space:nowrap}
 /* lo stato non e' mai solo un colore */
 .chip.st-annullato,.chip.st-non-fatto{background:repeating-linear-gradient(135deg,
