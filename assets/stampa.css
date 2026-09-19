@@ -89,7 +89,10 @@
 /* l'orario resta unito, ma la cella puo' mandare a capo il turno successivo:
    con nowrap la colonna si allargava comunque e la tabella sbordava */
 .foglio .cella-turno{font-size:7pt;white-space:normal;line-height:1.25}
-.foglio .pois{width:7px;height:7px;border-width:1.5px;vertical-align:0}
+/* la pastiglia contiene il codice: non si puo' rimpicciolire a un puntino,
+   ma sulla carta serve compatta */
+.foglio .pois{min-width:16px;height:12px;padding:0 2px;font-size:6.5pt;
+  border-width:1px;border-radius:6px;vertical-align:-2px}
 /* una riga per giorno non deve mai spezzarsi fra due pagine */
 .foglio .mese tr{break-inside:avoid}
 .foglio .mese thead{display:table-header-group}   /* l'intestazione si ripete */

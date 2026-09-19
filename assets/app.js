@@ -161,6 +161,18 @@ const etichettaEdu = (c) => (educatore(c) || {}).etichetta || c;
 const etichettaBimbo = (c) => (bambino(c) || {}).etichetta || c;
 const coloreBimbo = (c) => (bambino(c) || {}).colore || '#8A8175';
 
+/* Inchiostro leggibile sopra un colore: nero o bianco, quello che stacca di
+   piu'. Serve perche' il codice del bambino sta DENTRO la pastiglia colorata,
+   e con dodici tinte non si puo' scegliere a occhio una volta per tutte. */
+function inchiostroSu(sfondo) {
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(String(sfondo).trim());
+  if (!m) return '#1A1410';
+  const lin = (v) => { const c = parseInt(v, 16) / 255; return c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4; };
+  const L = .2126 * lin(m[1]) + .7152 * lin(m[2]) + .0722 * lin(m[3]);
+  const suNero = (L + .05) / .05, suBianco = 1.05 / (L + .05);
+  return suNero >= suBianco ? '#1A1410' : '#FFFFFF';
+}
+
 /* ------------------------------------------------------------ registro
    Per ogni id vince la riga con `v` piu' alto, NON l'ultima del foglio: il
    modulo Google scrive le risposte nell'ordine in cui le riceve, che non e'
@@ -302,9 +314,15 @@ function turniDi(data, codiceEdu) {
 }
 const inAttesa = (id) => S.coda.some((p) => p.id === id);
 
+/* La pastiglia del bambino porta il colore E il codice. Unico posto in cui un
+   bambino viene disegnato: settimana, mese e foglio da stampare passano da qui,
+   quindi i due modi di identificarlo non possono divergere. */
 function pallini(codici) {
-  return (codici || []).map((b) =>
-    `<span class="pois" style="--seg:${esc(coloreBimbo(b))}" title="${esc(etichettaBimbo(b))}"></span>`).join('');
+  return (codici || []).map((b) => {
+    const col = coloreBimbo(b);
+    return `<span class="pois" style="--seg:${esc(col)};--suseg:${inchiostroSu(col)}"
+      title="${esc(b)} · ${esc(etichettaBimbo(b))}">${esc(b)}</span>`;
+  }).join('');
 }
 
 function chip(t) {
@@ -454,7 +472,7 @@ function tabellaBambini(turni) {
     <caption>Ore effettive per bambino</caption>
     <thead><tr><th scope="col">Bambino</th><th scope="col" class="n">Ore</th></tr></thead>
     <tbody>${BAMBINI.map((b) => `<tr>
-      <th scope="row"><span class="pois" style="--seg:${esc(b.colore)}"></span> ${esc(b.etichetta)}</th>
+      <th scope="row"><span class="pois" style="--seg:${esc(b.colore)};--suseg:${inchiostroSu(b.colore)}">${esc(b.codice)}</span> ${esc(b.etichetta)}</th>
       <td class="n">${oreIt(per.get(b.codice) || 0)}</td></tr>`).join('')}</tbody>
     <tfoot><tr><th scope="row">Totale</th><td class="n">${oreIt(tot)}</td></tr></tfoot></table>`;
 }
@@ -526,15 +544,15 @@ function vistaStatistiche() {
   const turni = turniTra(iso(giorni[0]), iso(giorni[giorni.length - 1]));
 
   const perB = orePerBambino(turni);
-  const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
+  const vociB = BAMBINI.map((b) => ({ codice: b.codice, etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
   const totB = vociB.reduce((a, v) => a + v.ore, 0);
 
   const perE = orePerEducatore(turni);
   const vociE = EDUCATORI.map((e) => ({ etichetta: e.codice, ore: perE.get(e.codice) || 0 }));
 
   const legenda = vociB.map((v) => `<li>
-      <span class="swatch" style="--seg:${esc(v.colore)}"></span>
-      <span class="who">${esc(v.etichetta)}</span>
+      <span class="swatch pois" style="--seg:${esc(v.colore)};--suseg:${inchiostroSu(v.colore)}">${esc(v.codice)}</span>
+      <span class="who"><b>${esc(v.codice)}</b> ${esc(v.etichetta)}</span>
       <span class="val">${oreIt(v.ore)} h</span></li>`).join('');
 
   return `<div class="barra">
@@ -657,7 +675,7 @@ function messaggio(testo, tipo) {
    numeri consegnati non possono discostarsi da quelli a video. */
 function corpoFoglio(periodo, turni) {
   const perB = orePerBambino(turni);
-  const vociB = BAMBINI.map((b) => ({ etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
+  const vociB = BAMBINI.map((b) => ({ codice: b.codice, etichetta: b.etichetta, colore: b.colore, ore: perB.get(b.codice) || 0 }));
   const totB = vociB.reduce((a, v) => a + v.ore, 0);
 
   const perE = orePerEducatore(turni);
@@ -668,8 +686,8 @@ function corpoFoglio(periodo, turni) {
   const oggi = new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const legenda = vociB.map((v) => `<li>
-      <span class="swatch" style="--seg:${esc(v.colore)}"></span>
-      <span class="who">${esc(v.etichetta)}</span>
+      <span class="swatch pois" style="--seg:${esc(v.colore)};--suseg:${inchiostroSu(v.colore)}">${esc(v.codice)}</span>
+      <span class="who"><b>${esc(v.codice)}</b> ${esc(v.etichetta)}</span>
       <span class="val">${oreIt(v.ore)} h</span></li>`).join('');
 
   const tabellaEdu = `<table class="data">
@@ -730,7 +748,7 @@ function corpoFoglio(periodo, turni) {
   e non fatti restano registrati ma non contano. Un'educatrice che segue due
   bambini nella stessa fascia fa un turno solo, e ciascun bambino riceve tutte
   quelle ore: per questo il totale per bambino puo' superare quello per educatrice.
-  Nessun nome di persona: educatrici per codice, bambini per colore.
+  Nessun nome di persona: educatrici (E1…) e bambini (C1…) per codice e colore.
 </p>`;
 }
 
@@ -847,7 +865,8 @@ function riempiModulo() {
   $('#m-stato').innerHTML = STATI.map((s) => `<option value="${s}">${s}</option>`).join('');
   $('#m-bambini').innerHTML = BAMBINI.map((b) => `<label class="scelta">
       <input type="checkbox" name="bambini" value="${esc(b.codice)}">
-      <span class="pois" style="--seg:${esc(b.colore)}"></span> ${esc(b.etichetta)}</label>`).join('');
+      <span class="pois" style="--seg:${esc(b.colore)};--suseg:${inchiostroSu(b.colore)}">${esc(b.codice)}</span>
+      ${esc(b.etichetta)}</label>`).join('');
   $('#io').innerHTML = `<option value="">— scegli —</option>` + EDUCATORI.map((e) =>
     `<option value="${esc(e.codice)}"${e.codice === S.io ? ' selected' : ''}>${esc(e.codice)} · ${esc(e.etichetta)}</option>`).join('');
 }

@@ -425,12 +425,11 @@ body.senza-io .io-avviso{
 .chip-ora{flex:0 0 100%;font-size:10px;font-weight:700;letter-spacing:0;
   font-variant-numeric:tabular-nums;white-space:nowrap}
 .chip-edu{flex:0 0 auto;font-size:10px;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
-/* I pallini cedono spazio per primi, e si sovrappongono un po' quando sono
-   tanti: nella colonna da 98px tre bambini interi spingevano le ore su una
-   terza riga, dove "3,00 h" sembrava staccato dal turno. */
-.chip-pois{display:flex;gap:2px;align-items:center;flex:0 1 auto;min-width:0}
-.chip-pois .pois{width:11px;height:11px;flex:0 0 11px}
-.chip-pois .pois + .pois{margin-left:-3px}
+/* Le pastiglie cedono spazio per primi quando la colonna e' stretta. Non si
+   sovrappongono piu' e non si rimpiccioliscono: ora contengono il codice, e
+   sovrapposte o minuscole il codice non si leggerebbe. Se non ci stanno,
+   vanno a capo. */
+.chip-pois{display:flex;gap:3px;align-items:center;flex:0 1 auto;min-width:0;flex-wrap:wrap}
 .chip-ore{flex:0 0 auto;margin-left:auto;font-size:10px;letter-spacing:0;color:var(--muted);
   font-variant-numeric:tabular-nums;white-space:nowrap}
 /* lo stato non e' mai solo un colore */
@@ -442,9 +441,17 @@ body.senza-io .io-avviso{
 .chip.attesa{border-style:dashed}
 .chip.attesa .chip-ore::after{content:" ⏳"}
 
-/* pallino colorato del bambino: colore + titolo, mai il colore da solo */
-.pois{display:inline-block;width:13px;height:13px;border-radius:50%;
-  border:2px solid var(--ink);background:var(--seg);vertical-align:-2px}
+/* La pastiglia del bambino porta il colore E il codice (C1…C12). Con dodici
+   bambini il colore da solo non regge: due tinte vicine si confondono e in
+   bianco e nero spariscono tutte. L'inchiostro (--suseg) lo sceglie il codice
+   in base al fondo, cosi' il testo resta leggibile su ogni colore. */
+.pois{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:16px;padding:0 3px;border-radius:8px;
+  border:1.5px solid var(--ink);background:var(--seg);color:var(--suseg,var(--ink));
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:0;
+  vertical-align:-3px;
+}
 
 /* ——— griglia del mese ———
    A larghezza libera la tabella misurava 1039px dentro un contenitore da 968px:
@@ -460,7 +467,12 @@ body.senza-io .io-avviso{
 .mese thead th{background:var(--sage);position:sticky;top:0}
 .mese tbody th{white-space:nowrap;background:var(--card)}
 .mese tr.festivo td,.mese tr.festivo th{background:var(--lilac)}
-.cella-turno{display:block;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* Con nove educatrici la colonna e' larga ~78px: l'orario e le pastiglie dei
+   bambini non ci stanno affiancati e il testo sbordava sulla colonna vicina.
+   Quindi la cella manda a capo: prima l'orario, sotto le pastiglie. */
+.cella-turno{display:block;white-space:normal;line-height:1.35;
+  font-variant-numeric:tabular-nums}
+.cella-turno .pois{margin-top:2px}
 /* Un turno annullato nella griglia sembrava identico a uno fatto, ma le ore
    del giorno non lo contavano: sul foglio consegnato il conto non tornava e
    non si capiva perche'. Ora porta la parola, oltre al tratto. */
