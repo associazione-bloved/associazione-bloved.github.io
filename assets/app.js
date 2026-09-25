@@ -705,9 +705,10 @@ function corpoFoglio(periodo, turni) {
       <td class="n">${oreIt(perE.get(e.codice) || 0)}</td></tr>`).join('')}</tbody>
     <tfoot><tr><th scope="row">Totale</th><td class="n">${oreIt(totE)}</td></tr></tfoot></table>`;
 
+  /* Niente tasto che chiami la stampa da codice: Safari 27 e' caduto due volte in PrintingUI
+     (18/09 e 25/09) proprio su quella chiamata. Cmd+P passa dal menu e regge. */
   return `<p class="solo-schermo">
-  <button type="button" onclick="window.print()">Stampa questo foglio</button>
-  <span>oppure usa Cmd+P. Da qui puoi anche salvarlo in PDF.</span>
+  <span>Per stampare premi <b>Cmd+P</b> (oppure menu File → Stampa). Da li' puoi anche salvarlo in PDF.</span>
 </p>
 
 <header class="foglio-testa">
