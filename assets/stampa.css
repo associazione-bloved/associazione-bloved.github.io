@@ -72,8 +72,8 @@
 /* il calendario invece puo' spezzarsi: se un mese non ci sta, meglio due
    pagine che una tabella schiacciata */
 .foglio-sez:has(.mese){break-inside:auto}
-/* il riepilogo parte da pagina nuova: spezzato a meta' non si legge */
-.interrompi{break-before:page}
+/* niente salto pagina forzato: lasciava fogli quasi bianchi. break-inside:avoid
+   sulla sezione basta gia' a non spezzare il riepilogo a meta'. */
 
 .foglio-due{display:grid;gap:22px;grid-template-columns:1fr 1fr;align-items:start}
 
@@ -81,7 +81,9 @@
    Sette educatrici piu' giorno e ore fanno nove colonne: a larghezza libera
    la tabella sbordava dal foglio e l'ultima colonna finiva tagliata. Si fissa
    la larghezza totale e si lascia che siano le celle a stringersi. */
-.foglio .mese{font-size:7.5pt;width:100%;table-layout:fixed}
+/* min-width:0 annulla i 900px dello schermo: il foglio e' largo 190mm e con
+   nove educatrici la griglia sbordava a destra */
+.foglio .mese{font-size:7.5pt;width:100%;min-width:0;table-layout:fixed}
 .foglio .mese th,.foglio .mese td{padding:1.5px 4px;overflow-wrap:break-word;line-height:1.2}
 .foglio .mese thead th:first-child{width:13%}
 .foglio .mese thead th:nth-child(2){width:9%}

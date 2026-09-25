@@ -732,7 +732,7 @@ function corpoFoglio(periodo, turni) {
   ${grigliaGiorni(turni, periodo.giorni)}
 </section>
 
-<section class="foglio-sez interrompi">
+<section class="foglio-sez">
   <h2>Riepilogo delle ore</h2>
   <div class="foglio-due">
     <figure class="chart donut">
