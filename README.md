@@ -119,3 +119,10 @@ spezzati su due righe.
 
 Il controllo non è opzionale per una modifica visiva: l'accessibilità è il punto
 di questo sito.
+
+## Dopo ogni modifica a css o js
+
+Safari tiene in memoria i file vecchi anche dopo la pubblicazione: il foglio da
+stampare ha continuato a sbordare con il css gia' corretto sul sito. Ogni link a
+`assets/*.css|js` nelle pagine porta `?v=AAAA-MM-GG`: cambia la data in tutte e
+tre le pagine quando tocchi quei file, e i telefoni scaricano la versione nuova.
