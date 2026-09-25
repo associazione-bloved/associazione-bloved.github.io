@@ -18,9 +18,8 @@ const C = window.CONFIG || {};
 const MODO = (C.formId && C.campo && C.sheetId) ? 'google' : 'locale';
 const BASE = C.base || 'https://docs.google.com';   // spostabile solo per le prove
 const URL_FORM = `${BASE}/forms/d/e/${C.formId}/formResponse`;
-const gviz = (foglio) =>
-  `${BASE}/spreadsheets/d/${C.sheetId}/gviz/tq?tqx=out:csv&headers=1` +
-  (foglio ? `&sheet=${encodeURIComponent(foglio)}` : '') + `&_=${Date.now()}`;
+const gviz = () =>
+  `${BASE}/spreadsheets/d/${C.sheetId}/gviz/tq?tqx=out:csv&headers=1&_=${Date.now()}`;
 
 const K_CODA = 'bloved.coda';
 const K_LOCALE = 'bloved.righe';
@@ -28,8 +27,8 @@ const K_LOCALE = 'bloved.righe';
 const GIORNI = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 const STATI = ['fatto', 'annullato', 'non fatto'];
 
-let EDUCATORI = C.educatori || [];
-let BAMBINI = C.bambini || [];
+const EDUCATORI = C.educatori || [];
+const BAMBINI = C.bambini || [];
 
 const S = {                      // stato della pagina
   vista: 'settimana',
@@ -284,16 +283,24 @@ async function salvaEConferma(payload) {
 }
 
 /* La coda e' la promessa che niente va perso: quello che non e' stato
-   confermato resta sul telefono e riparte da solo. */
+   confermato resta sul telefono e riparte da solo.
+   Toglie dalla coda solo cio' che il foglio ha confermato. Prima riscriveva la
+   coda con una fotografia presa all'inizio: un turno aggiunto mentre girava
+   (fino a ~40s per voce) spariva dal telefono. E un giro alla volta: focus,
+   timer e 'online' possono chiamarla insieme. */
+let svuotando = false;
 async function svuotaCoda() {
-  if (!S.coda.length) return;
-  const restano = [];
-  for (const p of S.coda) {
-    const ok = await salvaEConferma(p).catch(() => false);
-    if (!ok) restano.push(p);
+  if (svuotando || !S.coda.length) return;
+  svuotando = true;
+  try {
+    for (const p of [...S.coda]) {
+      if (!(await salvaEConferma(p).catch(() => false))) continue;
+      S.coda = S.coda.filter((q) => !(q.id === p.id && q.v === p.v));
+      scriviJSON(K_CODA, S.coda);
+    }
+  } finally {
+    svuotando = false;
   }
-  S.coda = restano;
-  scriviJSON(K_CODA, S.coda);
   disegna();
 }
 
@@ -788,7 +795,6 @@ async function avviaFoglio() {
       'Controlla la connessione e ricarica la pagina.</p>';
     return;
   }
-  await configDaFoglio();
 
   const giorni = [];
   for (let d = daISO(da); iso(d) <= a; d = piuGiorni(d, 1)) giorni.push(d);
@@ -871,30 +877,6 @@ function riempiModulo() {
     `<option value="${esc(e.codice)}"${e.codice === S.io ? ' selected' : ''}>${esc(e.codice)} · ${esc(e.etichetta)}</option>`).join('');
 }
 
-/* Se nel foglio c'e' una scheda "Config" vince lei: cosi' i nomi e i colori si
-   cambiano da foglio di calcolo, senza toccare il codice. */
-async function configDaFoglio() {
-  if (MODO !== 'google') return;
-  try {
-    const r = await fetch(gviz('Config'), { cache: 'no-store' });
-    if (!r.ok) return;
-    const righe = leggiCSV(await r.text());
-    const edu = [], bam = [];
-    for (const [tipo, codice, etichetta, colore] of righe.slice(1)) {
-      if (!codice) continue;
-      if (/^educatric/i.test(tipo || '')) edu.push({ codice: codice.trim(), etichetta: (etichetta || codice).trim() });
-      if (/^bambin/i.test(tipo || '')) bam.push({ codice: codice.trim(), etichetta: (etichetta || codice).trim(), colore: (colore || '#8A8175').trim() });
-    }
-    if (edu.length) EDUCATORI = edu;
-    if (bam.length) BAMBINI = bam;
-    // la mia identita' puo' non esistere piu' dopo una modifica del foglio
-    if (S.io && !educatore(S.io)) S.io = '';
-    // il foglio da stampare non ha il modulo: lo aggiorna solo il registro.
-    // Dentro il try, una chiamata mancata scarterebbe anche gli elenchi appena letti.
-    if (document.getElementById('modulo')) riempiModulo();
-  } catch { /* scheda assente: restano gli elenchi di config.js */ }
-}
-
 /* --------------------------------------------------------------- via */
 function avvia() {
   riempiModulo();
@@ -960,7 +942,7 @@ function avvia() {
   setInterval(riallinea, 60000);
 
   disegna();
-  aggiorna().then(configDaFoglio).then(() => { disegna(); return svuotaCoda(); });
+  aggiorna().then(svuotaCoda);
 }
 
 /* Lo stesso file serve due pagine: il registro e il foglio da stampare.

@@ -99,9 +99,9 @@ bianco e nero.
 
 ## Modificare educatrici e bambini
 
-Si cambiano dal foglio, in una scheda chiamata `Config` (colonne: tipo, codice,
-etichetta, colore). Se c'è, vince sul contenuto di `config.js`. I sei colori di
-partenza sono quelli del file Excel originale dell'associazione.
+Si cambiano solo in `assets/config.js`: nove educatrici (E1…E9) e dodici bambini
+(C1…C12), ognuno con codice e colore fissi. I primi sei colori sono quelli del
+file Excel originale dell'associazione.
 
 ## Anteprima e controlli
 

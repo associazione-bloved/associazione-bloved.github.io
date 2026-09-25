@@ -11,8 +11,7 @@ window.CONFIG = {
   // .../spreadsheets/d/  QUESTO PEZZO  /edit   — il foglio collegato al modulo
   sheetId: "1KNpOm4KXXTwacjQV5nFqzdk8LI7jzNRQz3xrXWVknno",
 
-  // Elenchi di riserva. Se nel foglio esiste una scheda "Config" con colonne
-  // tipo | codice | etichetta | colore, quella vince e si modifica senza toccare il codice.
+  // Elenchi fissi: si cambiano solo qui.
   educatori: [
     { codice: "E1", etichetta: "Educatrice 1" },
     { codice: "E2", etichetta: "Educatrice 2" },
